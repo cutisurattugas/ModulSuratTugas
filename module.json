@@ -1,0 +1,13 @@
+{
+    "name": "SuratTugas",
+    "alias": "surattugas",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\SuratTugas\\Providers\\SuratTugasServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -11,6 +11,11 @@
 |
 */
 
+use Illuminate\Support\Facades\Route;
+
 Route::prefix('surattugas')->group(function() {
-    Route::get('/', 'SuratTugasController@index');
+     Route::prefix('dinas-luar')->group(function () {
+         Route::get('/', 'DinasLuarController@index')->name('dinas_luar.index');
+         Route::get('/create', 'DinasLuarController@create')->name('dinas_luar.create');
+     });
 });

@@ -15,6 +15,7 @@ class CreatePerjalananDinasTable extends Migration
     {
         Schema::create('perjalanan_dinas', function (Blueprint $table) {
             $table->id();
+            $table->string('access_token');
             $table->string('nomor_surat')->unique();
             $table->unsignedBigInteger('pejabat_id');
             $table->enum('jenis', ['individu', 'tim']);

@@ -16,7 +16,7 @@
             <div class="card">
                 <div class="card-body">
 
-                    <form action="{{ route('perjadin.update', $perjalanan->id) }}" method="POST">
+                    <form action="{{ route('perjadin.update', $perjalanan->access_token) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="jenis" value="{{ $perjalanan->jenis }}">

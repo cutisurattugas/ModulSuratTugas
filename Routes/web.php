@@ -18,7 +18,8 @@ Route::prefix('surattugas')->group(function() {
          Route::get('/', 'PerjalananDinasController@index')->name('perjadin.index');
          Route::get('/create', 'PerjalananDinasController@create')->name('perjadin.create');
          Route::post('/store', 'PerjalananDinasController@store')->name('perjadin.store');
-         Route::get('/edit/{id}', 'PerjalananDinasController@edit')->name('perjadin.edit');
-         Route::put('/update/{id}', 'PerjalananDinasController@update')->name('perjadin.update');
+         Route::get('/edit/{access_token}', 'PerjalananDinasController@edit')->name('perjadin.edit');
+         Route::put('/update/{access_token}', 'PerjalananDinasController@update')->name('perjadin.update');
+         Route::post('/laporan/upload/{access_token}', 'PerjalananDinasController@upload')->name('perjadin.upload');
      });
 });

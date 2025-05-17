@@ -16,6 +16,7 @@ class PerjalananDinas extends Model
         'nomor_surat',
         'pejabat_id',
         'jenis',
+        'access_token',
     ];
 
     public function pejabat()

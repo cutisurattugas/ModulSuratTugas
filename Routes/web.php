@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('surattugas')->group(function() {
      Route::prefix('dinas-luar')->group(function () {
-         Route::get('/', 'DinasLuarController@index')->name('dinas_luar.index');
-         Route::get('/create', 'DinasLuarController@create')->name('dinas_luar.create');
+         Route::get('/', 'PerjalananDinasController@index')->name('perjadin.index');
+         Route::get('/create', 'PerjalananDinasController@create')->name('perjadin.create');
+         Route::post('/store', 'PerjalananDinasController@store')->name('perjadin.store');
      });
 });

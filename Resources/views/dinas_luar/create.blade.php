@@ -54,7 +54,7 @@
     {{-- flat pickr --}}
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        flatpickr("#waktu_kegiatan", {
+        flatpickr(".flatpickr", {
             mode: "range",
             dateFormat: "Y-m-d",
             allowInput: true,

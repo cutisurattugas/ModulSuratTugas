@@ -14,7 +14,7 @@
                     <div class="lead">
                         Manajemen pengajuan dinas luar.
                         {{-- Tombol buat pengajuan nanti bisa dikondisikan berdasarkan role --}}
-                        <a href="{{route('dinas_luar.create')}}" class="btn btn-primary btn-sm float-right">Buat Surat</a>
+                        <a href="{{ route('perjadin.create') }}" class="btn btn-primary btn-sm float-right">Buat Surat</a>
                     </div>
 
                     <div class="mt-2">
@@ -28,20 +28,27 @@
                                 data-bs-target="#individu" type="button" role="tab">Individu</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="kelompok-tab" data-bs-toggle="tab"
-                                data-bs-target="#kelompok" type="button" role="tab">Kelompok</button>
+                            <button class="nav-link" id="kelompok-tab" data-bs-toggle="tab" data-bs-target="#kelompok"
+                                type="button" role="tab">Kelompok</button>
                         </li>
                     </ul>
 
                     {{-- Tab Content --}}
                     <div class="tab-content" id="dinasLuarTabContent">
                         <div class="tab-pane fade show active" id="individu" role="tabpanel">
-                            @include('surattugas::dinas_luar.components.tabel', ['mode' => 'individu', 'dinas_data' => []])
+                            @include('surattugas::dinas_luar.components.tabel', [
+                                'mode' => 'individu',
+                                'dinas_data' => $dinas_individu,
+                            ])
                         </div>
                         <div class="tab-pane fade" id="kelompok" role="tabpanel">
-                            @include('surattugas::dinas_luar.components.tabel', ['mode' => 'kelompok', 'dinas_data' => []])
+                            @include('surattugas::dinas_luar.components.tabel', [
+                                'mode' => 'kelompok',
+                                'dinas_data' => $dinas_tim,
+                            ])
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

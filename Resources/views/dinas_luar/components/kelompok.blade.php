@@ -82,4 +82,5 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Simpan</button>
+    <a href="{{ route('perjadin.index') }}" class="btn btn-default">Kembali</a>
 </form>

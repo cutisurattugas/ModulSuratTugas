@@ -13,8 +13,9 @@
                     <h1>Dinas Luar</h1>
                     <div class="lead">
                         Manajemen pengajuan dinas luar.
-                        {{-- Tombol buat pengajuan nanti bisa dikondisikan berdasarkan role --}}
-                        <a href="{{ route('perjadin.create') }}" class="btn btn-primary btn-sm float-right">Buat Surat</a>
+                        @if (auth()->user()->role_aktif === 'admin')
+                            <a href="{{ route('perjadin.create') }}" class="btn btn-primary btn-sm float-right">Buat Surat</a>
+                        @endif
                     </div>
 
                     <div class="mt-2">

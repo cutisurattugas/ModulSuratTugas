@@ -21,13 +21,53 @@ class PerjalananDinasController extends Controller
      */
     public function index()
     {
-        $individu = PerjalananDinasIndividu::with(['pegawai', 'perjalanan'])->latest()->get();
-        $tim = PerjalananDinasTim::with(['pegawai', 'perjalanan', 'pengikut'])->latest()->get();
+        $user = auth()->user();
+        $role = $user->role_aktif;
 
-        return view('surattugas::dinas_luar.index', [
-            'dinas_individu' => $individu,
-            'dinas_tim' => $tim,
-        ]);
+        // Ambil data pegawai dari user login
+        $pegawai = Pegawai::where('username', $user->username)->first();
+        $pegawai_id = optional($pegawai)->id;
+
+        // Ambil data pejabat (jika ada)
+        $pejabat = Pejabat::where('pegawai_id', $pegawai_id)->first();
+        $pejabat_id = optional($pejabat)->id;
+
+        // Variabel awal
+        $dinas_individu = collect(); // Data individu
+        $dinas_tim = collect();      // Data tim
+
+        if ($role === 'admin') {
+            // Admin bisa lihat semua data
+            $dinas_individu = PerjalananDinasIndividu::with('pegawai')->latest()->get();
+            $dinas_tim = PerjalananDinasTim::with(['pegawai', 'pengikut.pegawai'])->latest()->get();
+        } elseif ($role === 'direktur' || $role === 'wadir1' || $role === 'wadir2' || $role === 'wadir3') {
+            // PPK hanya bisa lihat surat tugas yang dia buat
+            $dinas_individu = PerjalananDinasIndividu::with('pegawai')
+                ->whereHas('perjalanan', function ($q) use ($pejabat_id) {
+                    $q->where('pejabat_id', $pejabat_id);
+                })
+                ->latest()->get();
+
+            $dinas_tim = PerjalananDinasTim::with(['pegawai', 'pengikut.pegawai'])
+                ->whereHas('perjalanan', function ($q) use ($pejabat_id) {
+                    $q->where('pejabat_id', $pejabat_id);
+                })
+                ->latest()->get();
+        } elseif ($role === 'pegawai' || $role === 'dosen' || $role === 'staf') {
+            // Pegawai biasa hanya lihat:
+            // - Sebagai pegawai di perjalanan individu
+            // - Sebagai ketua pelaksana di perjalanan tim (bukan pengikut)
+
+            $dinas_individu = PerjalananDinasIndividu::with('pegawai')
+                ->where('pegawai_id', $pegawai_id)
+                ->latest()->get();
+
+            $dinas_tim = PerjalananDinasTim::with(['pegawai', 'pengikut.pegawai'])
+                ->where('pegawai_id', $pegawai_id)
+                ->latest()->get();
+        }
+
+        return view('surattugas::dinas_luar.index', compact('dinas_individu', 'dinas_tim'));
     }
 
     /**
@@ -48,6 +88,7 @@ class PerjalananDinasController extends Controller
      */
     public function store(Request $request)
     {
+
         // 1. Validasi data utama
         $request->validate([
             'nomor_surat' => 'required|unique:perjalanan_dinas,nomor_surat',
@@ -128,17 +169,10 @@ class PerjalananDinasController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'Perjalanan dinas berhasil disimpan',
-                'data' => $perjalanan
-            ], 201);
+            return redirect()->route('perjadin.index')->with('success', 'Perjalanan Dinas berhasil diajukan.');
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return response()->json([
-                'message' => 'Terjadi kesalahan',
-                'error' => $e->getMessage(),
-            ], 500);
+            return redirect()->route('perjadin.index')->with('danger', 'Perjalanan Dinas gagal diajukan karena.');
         }
     }
 
@@ -160,7 +194,19 @@ class PerjalananDinasController extends Controller
      */
     public function edit($id)
     {
-        return view('surattugas::edit');
+        // Ambil data perjalanan dinas beserta relasi individu/tim dan pengikut
+        $perjalanan = PerjalananDinas::with([
+            'individu',
+            'tim' => function ($query) {
+                $query->with('pengikut'); // <-- Penting: load relasi pengikut
+            }
+        ])->findOrFail($id);
+
+        // Ambil semua pegawai dan pejabat untuk dropdown
+        $pegawai = Pegawai::all();
+        $pejabat = Pejabat::with('pegawai')->get();
+
+        return view('surattugas::dinas_luar.edit', compact('perjalanan', 'pegawai', 'pejabat'));
     }
 
     /**
@@ -171,7 +217,69 @@ class PerjalananDinasController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'jenis' => 'required|in:individu,tim',
+            'pejabat_id' => 'required|exists:pejabats,id',
+            'nomor_surat' => 'required|string|unique:perjalanan_dinas,nomor_surat,' . $id,
+
+            // Validasi untuk individu
+            'pegawai_id' => $request->jenis === 'individu' ? 'required|exists:pegawais,id' : 'nullable',
+            'kegiatan' => $request->jenis === 'individu' ? 'required|string' : 'nullable',
+            'tanggal' => $request->jenis === 'individu' ? 'required|string' : 'nullable',
+            'tempat' => $request->jenis === 'individu' ? 'required|string' : 'nullable',
+
+            // Validasi untuk tim
+            'pegawai_id_tim' => $request->jenis === 'tim' ? 'required|exists:pegawais,id' : 'nullable',
+            'maksud' => $request->jenis === 'tim' ? 'required|string' : 'nullable',
+            'alat_angkutan' => $request->jenis === 'tim' ? 'required|string' : 'nullable',
+            'lama_perjalanan' => $request->jenis === 'tim' ? 'required|integer|min:1' : 'nullable',
+            'tanggal_tim' => $request->jenis === 'tim' ? 'required|string' : 'nullable',
+            'pengikut_ids' => $request->jenis === 'tim' ? 'nullable|array' : 'nullable',
+        ]);
+
+        $perjalanan = PerjalananDinas::findOrFail($id);
+        $dates = explode(' to ', $request->tanggal ?? $request->tanggal_tim);
+
+        $data = [
+            'jenis' => $request->jenis,
+            'pejabat_id' => $request->pejabat_id,
+            'nomor_surat' => $request->nomor_surat,
+        ];
+
+        $perjalanan->update($data);
+
+        if ($request->jenis === 'individu') {
+            $perjalanan->individu()->updateOrCreate([], [
+                'pegawai_id' => $request->pegawai_id,
+                'kegiatan' => $request->kegiatan,
+                'tanggal_mulai' => $dates[0] ?? null,
+                'tanggal_selesai' => $dates[1] ?? $dates[0],
+                'tempat' => $request->tempat,
+            ]);
+        } elseif ($request->jenis === 'tim') {
+            $perjalanan->tim()->delete(); // Hapus dulu jika ada
+
+            $tim = $perjalanan->tim()->create([
+                'pegawai_id' => $request->pegawai_id_tim,
+                'maksud' => $request->maksud,
+                'alat_angkutan' => $request->alat_angkutan,
+                'lama_perjalanan' => $request->lama_perjalanan,
+                'tanggal_berangkat' => $dates[0] ?? null,
+                'tanggal_kembali' => $dates[1] ?? $dates[0],
+            ]);
+
+            // Update pengikut
+            $tim->pengikut()->delete();
+            if ($request->has('pengikut_ids')) {
+                foreach ($request->pengikut_ids as $pegawaiId) {
+                    $tim->pengikut()->create([
+                        'pegawai_id' => $pegawaiId,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('perjadin.index')->withSuccess('Data berhasil diperbarui.');
     }
 
     /**

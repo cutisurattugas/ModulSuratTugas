@@ -18,5 +18,7 @@ Route::prefix('surattugas')->group(function() {
          Route::get('/', 'PerjalananDinasController@index')->name('perjadin.index');
          Route::get('/create', 'PerjalananDinasController@create')->name('perjadin.create');
          Route::post('/store', 'PerjalananDinasController@store')->name('perjadin.store');
+         Route::get('/edit/{id}', 'PerjalananDinasController@edit')->name('perjadin.edit');
+         Route::put('/update/{id}', 'PerjalananDinasController@update')->name('perjadin.update');
      });
 });

@@ -42,6 +42,9 @@
 
                 {{-- Opsi --}}
                 <td class="text-center">
+                    <a class="btn btn-success btn-sm" href="{{route('perjadin.print', $item->perjalanan->access_token)}}">
+                        <i class="nav-icon fas fa-print"></i>
+                    </a>
                     @if ($mode === 'kelompok')
                         <button class="btn btn-secondary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#modalPelaksana{{ $item->id }}">
@@ -49,7 +52,12 @@
                         </button>
                     @endif
 
-                    @if (auth()->user()->role_aktif === 'pegawai' || auth()->user()->role_aktif === 'dosen' || auth()->user()->role_aktif === 'direktur' || auth()->user()->role_aktif === 'wadir1' || auth()->user()->role_aktif === 'wadir2' || auth()->user()->role_aktif === 'wadir3')
+                    @if (auth()->user()->role_aktif === 'pegawai' ||
+                            auth()->user()->role_aktif === 'dosen' ||
+                            auth()->user()->role_aktif === 'direktur' ||
+                            auth()->user()->role_aktif === 'wadir1' ||
+                            auth()->user()->role_aktif === 'wadir2' ||
+                            auth()->user()->role_aktif === 'wadir3')
                         @php
                             $laporan = Modules\SuratTugas\Entities\LaporanPerjalananDinas::where(
                                 'perjalanan_dinas_id',
@@ -68,12 +76,10 @@
                                 <i class="nav-icon fas fa-arrow-circle-up"></i>
                             </button>
                         @endif
-                        <a class="btn btn-success btn-sm" href="#">
-                            <i class="nav-icon fas fa-print"></i>
-                        </a>
                     @endif
                     @if (auth()->user()->role_aktif === 'admin' && isset($item->perjalanan->access_token))
-                        <a href="{{ route('perjadin.edit', $item->perjalanan->access_token) }}" class="btn btn-warning btn-sm">
+                        <a href="{{ route('perjadin.edit', $item->perjalanan->access_token) }}"
+                            class="btn btn-warning btn-sm">
                             <i class="nav-icon fas fa-edit"></i>
                         </a>
                     @endif
@@ -122,14 +128,16 @@
                             enctype="multipart/form-data">
                             @csrf
                             <div class="modal-header">
-                                <h5 class="modal-title" id="modalUploadLaporanLabel{{ $item->perjalanan->access_token }}">Unggah
+                                <h5 class="modal-title"
+                                    id="modalUploadLaporanLabel{{ $item->perjalanan->access_token }}">Unggah
                                     Laporan</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label for="file_laporan{{ $item->perjalanan->access_token }}" class="form-label">Pilih File
+                                    <label for="file_laporan{{ $item->perjalanan->access_token }}"
+                                        class="form-label">Pilih File
                                         Laporan</label>
                                     <input type="file" name="file_laporan" class="form-control"
                                         id="file_laporan{{ $item->perjalanan->access_token }}" required>

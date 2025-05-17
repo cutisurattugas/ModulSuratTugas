@@ -14,6 +14,7 @@ use Modules\SuratTugas\Entities\PerjalananDinas;
 use Modules\SuratTugas\Entities\PerjalananDinasIndividu;
 use Modules\SuratTugas\Entities\PerjalananDinasTim;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PerjalananDinasController extends Controller
 {
@@ -197,7 +198,7 @@ class PerjalananDinasController extends Controller
     public function edit($access_token)
     {
         $perjalanan_id = PerjalananDinas::where('access_token', $access_token)->first()->value('id');
-        
+
         // Ambil data perjalanan dinas beserta relasi individu/tim dan pengikut
         $perjalanan = PerjalananDinas::with([
             'individu',
@@ -222,7 +223,7 @@ class PerjalananDinasController extends Controller
     public function update(Request $request, $access_token)
     {
         $perjalanan_id = PerjalananDinas::where('access_token', $access_token)->first()->value('id');
-        
+
         $request->validate([
             'jenis' => 'required|in:individu,tim',
             'pejabat_id' => 'required|exists:pejabats,id',
@@ -313,8 +314,20 @@ class PerjalananDinasController extends Controller
      * @param int $id
      * @return Renderable
      */
-    public function destroy($id)
+    public function printPerjadin($access_token)
     {
-        //
+        $perjalanan = PerjalananDinas::with([
+            'individu.pegawai',
+            'tim.pegawai',
+            'tim.pengikut.pegawai',
+        ])->where('access_token', $access_token)->firstOrFail();
+        $qrCodeUrl = url("https://prismfox.my.id");
+        $qrCodeImage = QrCode::format('svg')->size(100)->generate($qrCodeUrl);
+        // Sesuaikan view berdasarkan jenis
+        if ($perjalanan->jenis === 'individu') {
+            return view('surattugas::pdf.individu', compact('perjalanan', 'qrCodeImage'));
+        } else {
+            return view('surattugas::pdf.kelompok', compact('perjalanan', 'qrCodeImage'));
+        }
     }
 }

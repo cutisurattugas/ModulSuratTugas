@@ -21,5 +21,6 @@ Route::prefix('surattugas')->group(function() {
          Route::get('/edit/{access_token}', 'PerjalananDinasController@edit')->name('perjadin.edit');
          Route::put('/update/{access_token}', 'PerjalananDinasController@update')->name('perjadin.update');
          Route::post('/laporan/upload/{access_token}', 'PerjalananDinasController@upload')->name('perjadin.upload');
+         Route::get('/printPerjadin/{access_token}', 'PerjalananDinasController@printPerjadin')->name('perjadin.print');
      });
 });

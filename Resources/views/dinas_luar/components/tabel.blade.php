@@ -32,33 +32,49 @@
                 {{-- Tanggal --}}
                 <td class="text-center">
                     @if ($mode === 'individu')
-                        {{ date('d M Y', strtotime($item->tanggal_mulai)) }} - {{ date('d M Y', strtotime($item->tanggal_selesai)) }}
+                        {{ date('d M Y', strtotime($item->tanggal_mulai)) }} -
+                        {{ date('d M Y', strtotime($item->tanggal_selesai)) }}
                     @else
-                        {{ date('d M Y', strtotime($item->tanggal_berangkat)) }} - {{ date('d M Y', strtotime($item->tanggal_kembali)) }}
+                        {{ date('d M Y', strtotime($item->tanggal_berangkat)) }} -
+                        {{ date('d M Y', strtotime($item->tanggal_kembali)) }}
                     @endif
                 </td>
 
                 {{-- Opsi --}}
                 <td class="text-center">
                     @if ($mode === 'kelompok')
-                        <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalPelaksana{{ $item->id }}">
+                        <button class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalPelaksana{{ $item->id }}">
                             <i class="fas fa-users"></i>
                         </button>
                     @endif
-                    <a class="btn btn-warning btn-sm" href="#">
-                        <i class="nav-icon fas fa-edit"></i>
-                    </a>
+
+                    @if (auth()->user()->role_aktif === 'pegawai' || auth()->user()->role_aktif === 'dosen')
+                        <a class="btn btn-primary btn-sm" href="#">
+                            <i class="nav-icon fas fa-arrow-circle-up"></i>
+                        </a>
+                        <a class="btn btn-success btn-sm" href="#">
+                            <i class="nav-icon fas fa-print"></i>
+                        </a>
+                    @endif
+                    @if (auth()->user()->role_aktif === 'admin' && isset($item->perjalanan->id))
+                        <a href="{{ route('perjadin.edit', $item->perjalanan->id) }}" class="btn btn-warning btn-sm">
+                            <i class="nav-icon fas fa-edit"></i>
+                        </a>
+                    @endif
                 </td>
             </tr>
 
             {{-- Modal Pelaksana (hanya untuk kelompok) --}}
             @if ($mode === 'kelompok')
-                <div class="modal fade" id="modalPelaksana{{ $item->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $item->id }}" aria-hidden="true">
+                <div class="modal fade" id="modalPelaksana{{ $item->id }}" tabindex="-1"
+                    aria-labelledby="modalLabel{{ $item->id }}" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="modalLabel{{ $item->id }}">Daftar Pelaksana</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Tutup"></button>
                             </div>
                             <div class="modal-body">
                                 <strong>Pegawai Utama:</strong>
@@ -72,7 +88,8 @@
                                 @else
                                     <ul>
                                         @foreach ($item->pengikut as $pengikut)
-                                            <li>{{ $pengikut->pegawai->gelar_dpn ?? '' }}{{ $pengikut->pegawai->gelar_dpn ? ' ' : '' }}{{ $pengikut->pegawai->nama }}{{ $pengikut->pegawai->gelar_blk ? ', ' . $pengikut->pegawai->gelar_blk : '' }}</li>
+                                            <li>{{ $pengikut->pegawai->gelar_dpn ?? '' }}{{ $pengikut->pegawai->gelar_dpn ? ' ' : '' }}{{ $pengikut->pegawai->nama }}{{ $pengikut->pegawai->gelar_blk ? ', ' . $pengikut->pegawai->gelar_blk : '' }}
+                                            </li>
                                         @endforeach
                                     </ul>
                                 @endif

@@ -35,4 +35,11 @@ class PerjalananDinasTim extends Model
     {
         return $this->hasMany(PengikutPerjalananDinas::class);
     }
+
+    public function getPengikutIdsAttribute()
+    {
+        return $this->pengikut
+            ? $this->pengikut->pluck('pegawai_id')->toArray()
+            : [];
+    }
 }

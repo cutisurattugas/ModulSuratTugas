@@ -8,10 +8,12 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Pengaturan\Entities\Pejabat;
+use Modules\SuratTugas\Entities\LaporanPerjalananDinas;
 use Modules\SuratTugas\Entities\PengikutPerjalananDinas;
 use Modules\SuratTugas\Entities\PerjalananDinas;
 use Modules\SuratTugas\Entities\PerjalananDinasIndividu;
 use Modules\SuratTugas\Entities\PerjalananDinasTim;
+use Illuminate\Support\Str;
 
 class PerjalananDinasController extends Controller
 {
@@ -88,8 +90,6 @@ class PerjalananDinasController extends Controller
      */
     public function store(Request $request)
     {
-
-        // 1. Validasi data utama
         $request->validate([
             'nomor_surat' => 'required|unique:perjalanan_dinas,nomor_surat',
             'pejabat_id' => 'required|exists:pejabats,id',
@@ -99,14 +99,16 @@ class PerjalananDinasController extends Controller
         DB::beginTransaction();
 
         try {
-            // 2. Simpan data utama
+            $uuid = Str::uuid()->toString();
+            $access_token = substr($uuid, 0, 12);
+
             $perjalanan = PerjalananDinas::create([
                 'nomor_surat' => $request->nomor_surat,
                 'pejabat_id' => $request->pejabat_id,
                 'jenis' => $request->jenis,
+                'access_token' => $access_token,
             ]);
 
-            // 3. Simpan data detail berdasarkan jenis
             if ($request->jenis === 'individu') {
                 // Validasi tambahan
                 $request->validate([
@@ -192,15 +194,17 @@ class PerjalananDinasController extends Controller
      * @param int $id
      * @return Renderable
      */
-    public function edit($id)
+    public function edit($access_token)
     {
+        $perjalanan_id = PerjalananDinas::where('access_token', $access_token)->first()->value('id');
+        
         // Ambil data perjalanan dinas beserta relasi individu/tim dan pengikut
         $perjalanan = PerjalananDinas::with([
             'individu',
             'tim' => function ($query) {
                 $query->with('pengikut'); // <-- Penting: load relasi pengikut
             }
-        ])->findOrFail($id);
+        ])->findOrFail($perjalanan_id);
 
         // Ambil semua pegawai dan pejabat untuk dropdown
         $pegawai = Pegawai::all();
@@ -215,12 +219,14 @@ class PerjalananDinasController extends Controller
      * @param int $id
      * @return Renderable
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $access_token)
     {
+        $perjalanan_id = PerjalananDinas::where('access_token', $access_token)->first()->value('id');
+        
         $request->validate([
             'jenis' => 'required|in:individu,tim',
             'pejabat_id' => 'required|exists:pejabats,id',
-            'nomor_surat' => 'required|string|unique:perjalanan_dinas,nomor_surat,' . $id,
+            'nomor_surat' => 'required|string|unique:perjalanan_dinas,nomor_surat,' . $perjalanan_id,
 
             // Validasi untuk individu
             'pegawai_id' => $request->jenis === 'individu' ? 'required|exists:pegawais,id' : 'nullable',
@@ -237,7 +243,7 @@ class PerjalananDinasController extends Controller
             'pengikut_ids' => $request->jenis === 'tim' ? 'nullable|array' : 'nullable',
         ]);
 
-        $perjalanan = PerjalananDinas::findOrFail($id);
+        $perjalanan = PerjalananDinas::findOrFail($perjalanan_id);
         $dates = explode(' to ', $request->tanggal ?? $request->tanggal_tim);
 
         $data = [
@@ -280,6 +286,26 @@ class PerjalananDinasController extends Controller
         }
 
         return redirect()->route('perjadin.index')->withSuccess('Data berhasil diperbarui.');
+    }
+
+    public function upload(Request $request, $access_token)
+    {
+        $perjalanan_id = PerjalananDinas::where('access_token', $access_token)->first()->value('id');
+
+        $request->validate([
+            'file_laporan' => 'required|mimes:pdf,docx|max:10240', // 10MB max
+        ]);
+
+        $file = $request->file('file_laporan');
+        $filename = 'laporan_' . time() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('public/laporan', $filename);
+
+        LaporanPerjalananDinas::updateOrCreate(
+            ['perjalanan_dinas_id' => $perjalanan_id],
+            ['file_laporan' => $path, 'tanggal_upload' => now()]
+        );
+
+        return redirect()->back()->withSuccess('Laporan berhasil diunggah.');
     }
 
     /**

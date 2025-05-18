@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Surat Perjalanan Dinas - Individu {{$perjalanan->access_token}}</title>
+    <title>Surat Perjalanan Dinas - Individu {{ $perjalanan->access_token }}</title>
     <style>
         body {
             font-family: 'Times New Roman', serif;
@@ -39,12 +39,6 @@
             margin: 10px 0;
         }
 
-        h6 {
-            font-size: 10pt;
-            text-align: center;
-            margin: 10px 0;
-        }
-
         table.form {
             width: 100%;
             border-collapse: collapse;
@@ -59,7 +53,7 @@
             width: 30%;
         }
 
-        table.form td + td {
+        table.form td+td {
             width: 70%;
             font-weight: normal;
         }
@@ -185,19 +179,35 @@
             }
 
             body {
-                font-size: 10pt;
-                margin: 0.5in;
-                max-width: 8.5in;
-                background-color: white;
+                margin: 0;
+                padding: 0;
             }
 
             .page-wrapper {
                 box-shadow: none;
-                padding: 0;
+                padding-top: 0.5in;
+                padding-left: 0.5in;
+                padding-right: 0.5in;
+                height: 100vh;
+                position: relative;
+                background: white;
+                box-sizing: border-box;
             }
 
             .signatures {
                 page-break-inside: avoid;
+            }
+
+            .footer {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 0 0.5in 0.3in 0.5in;
+                font-size: 9pt;
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
             }
         }
     </style>
@@ -227,7 +237,10 @@
         <hr style="margin: 10px 0;">
 
         <h2>Surat Tugas</h2>
-        <h6>Nomor: {{ $perjalanan->nomor_surat }}</h6>
+        <p style="font-size: 10pt;
+            text-align: center;
+            margin: 10px 0;">Nomor:
+            {{ $perjalanan->nomor_surat }}</p>
 
         <p>Yang bertanda tangan dibawah ini, {{ $perjalanan->pejabat->jabatan->jabatan }} Politeknik Negeri Banyuwangi
             menugaskan Pegawai sebagai
@@ -261,7 +274,8 @@
             </tr>
             <tr>
                 <td>Waktu</td>
-                <td>: {{date('d M Y', strtotime($perjalanan->individu->tanggal_mulai))}} - {{date('d M Y', strtotime($perjalanan->individu->tanggal_selesai))}}</td>
+                <td>: {{ date('d M Y', strtotime($perjalanan->individu->tanggal_mulai)) }} -
+                    {{ date('d M Y', strtotime($perjalanan->individu->tanggal_selesai)) }}</td>
             </tr>
             <tr>
                 <td>Tempat</td>
@@ -275,7 +289,7 @@
         <div class="container">
             <!-- Tabel Cuti -->
             <div class="table-cuti">
-                
+
             </div>
 
             <!-- Kolom Tanda Tangan Bertiga Vertikal -->
@@ -296,7 +310,7 @@
                         </div>
                         {{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}
                         <br>
-                        NIP. {{ $perjalanan->pejabat->pegawai->nip}}
+                        NIP. {{ $perjalanan->pejabat->pegawai->nip }}
                     </div>
                 </div>
             </div>

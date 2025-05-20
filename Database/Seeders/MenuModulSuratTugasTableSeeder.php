@@ -30,13 +30,13 @@ class MenuModulSuratTugasTableSeeder extends Seeder
         if ($menu) {
             Menu::create([
                 'modul' => 'SuratTugas',
-                'label' => 'Dinas Luar',
-                'url' => 'surattugas/dinas-luar',
+                'label' => 'Kelola',
+                'url' => 'surattugas/kelola',
                 'can' => serialize(['admin']),
                 'icon' => 'far fa-circle',
                 'urut' => 2,
                 'parent_id' => $menu->id,
-                'active' => serialize(['surattugas/dinas-luar', 'surattugas/dinas-luar*']),
+                'active' => serialize(['surattugas/kelola', 'surattugas/kelola*']),
             ]);
         }
     }

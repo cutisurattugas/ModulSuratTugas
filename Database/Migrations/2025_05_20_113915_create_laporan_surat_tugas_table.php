@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLaporanPerjalananDinasTable extends Migration
+class CreateLaporanSuratTugasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateLaporanPerjalananDinasTable extends Migration
      */
     public function up()
     {
-        Schema::create('laporan_perjalanan_dinas', function (Blueprint $table) {
+        Schema::create('laporan_surat_tugas', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('perjalanan_dinas_id'); // FK
-            $table->string('file_laporan'); // direktori / path file (contoh: 'laporan/123.pdf')
+            $table->unsignedBigInteger('surat_tugas_id');
+            $table->string('file_laporan'); // Path file (PDF/doc)
             $table->enum('penilaian', ['Dibawah Ekspektasi', 'Sesuai Ekspektasi', 'Diatas Ekspektasi'])->nullable();
-            $table->foreign('perjalanan_dinas_id')->references('id')->on('perjalanan_dinas')->onDelete('cascade');
             $table->timestamp('tanggal_upload')->nullable();
             $table->timestamps();
         });
@@ -31,6 +30,6 @@ class CreateLaporanPerjalananDinasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('laporan_perjalanan_dinas');
+        Schema::dropIfExists('laporan_surat_tugas');
     }
 }

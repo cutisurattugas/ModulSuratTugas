@@ -6,20 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Pengaturan\Entities\Pegawai;
 
-class PengikutPerjalananDinas extends Model
+class AnggotaSuratTugas extends Model
 {
-    protected $table = 'pengikut_perjalanan_dinas';
+    use HasFactory;
 
     protected $fillable = [
-        'perjalanan_dinas_tim_id',
+        'surat_tugas_id',
         'pegawai_id',
     ];
 
-    public function tim()
+    // Relasi ke SuratTugas
+    public function suratTugas()
     {
-        return $this->belongsTo(PerjalananDinasTim::class, 'perjalanan_dinas_tim_id');
+        return $this->belongsTo(SuratTugas::class);
     }
 
+    // Relasi ke Pegawai (anggota tim)
     public function pegawai()
     {
         return $this->belongsTo(Pegawai::class);

@@ -13,14 +13,14 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('surattugas')->group(function() {
-     Route::prefix('dinas-luar')->group(function () {
-         Route::get('/', 'PerjalananDinasController@index')->name('perjadin.index');
-         Route::get('/create', 'PerjalananDinasController@create')->name('perjadin.create');
-         Route::post('/store', 'PerjalananDinasController@store')->name('perjadin.store');
-         Route::get('/edit/{access_token}', 'PerjalananDinasController@edit')->name('perjadin.edit');
-         Route::put('/update/{access_token}', 'PerjalananDinasController@update')->name('perjadin.update');
-         Route::post('/laporan/upload/{access_token}', 'PerjalananDinasController@upload')->name('perjadin.upload');
-         Route::get('/printPerjadin/{access_token}', 'PerjalananDinasController@printPerjadin')->name('perjadin.print');
-     });
+Route::prefix('surattugas')->group(function () {
+    Route::prefix('kelola')->group(function () {
+        Route::get('/', 'SuratTugasController@index')->name('surattugas.index');
+        Route::get('/create', 'SuratTugasController@create')->name('surattugas.create');
+        Route::post('/store', 'SuratTugasController@store')->name('surattugas.store');
+        Route::get('/edit/{access_token}', 'SuratTugasController@edit')->name('surattugas.edit');
+        Route::put('/update/{access_token}', 'SuratTugasController@update')->name('surattugas.update');
+        Route::post('/laporan/upload/{access_token}', 'SuratTugasController@upload')->name('surattugas.upload');
+        Route::get('/printPerjadin/{access_token}', 'SuratTugasController@printPerjadin')->name('surattugas.print');
+    });
 });

@@ -15,11 +15,21 @@
             box-sizing: border-box;
         }
 
+        /* Mengompres ukuran vertikal untuk mengurangi total tinggi dokumen */
+        h2 {
+            font-size: 14pt;
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        p {
+            margin: 5px 0;
+        }
+
         .kop-surat {
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Logo akan rata kiri */
         }
 
         .kop-surat img {
@@ -82,17 +92,10 @@
             text-align: center;
         }
 
-        .catatan-kepegawaian {
-            margin-top: 10px;
-            font-size: 9pt;
-        }
-
-        /* Tombol Print hanya muncul di web */
         .web-only {
             text-align: center;
             margin-bottom: 20px;
         }
-
         .btn-print {
             display: inline-block;
             padding: 5px 10px;
@@ -110,6 +113,61 @@
             background-color: #0056b3;
             transform: scale(1.05);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Garis horizontal memanjang */
+        .horizontal-line {
+            width: 100%;
+            border-top: 1px solid #000;
+            margin: 15px 0 10px 0;
+        }
+
+        /* Styling untuk 3 kolom tanda tangan tambahan */
+        .additional-signatures {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .additional-signature {
+            text-align: left;
+            width: 250px;
+            min-height: 120px;
+            /* Mengurangi tinggi minimum */
+        }
+
+        /* Style untuk bagian kiri dan kanan kolom tanda tangan */
+        .signature-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .signature-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+
+        .signature-label {
+            width: 120px;
+        }
+
+        .signature-colon {
+            width: 15px;
+        }
+
+        /* Styling untuk Mengetahui */
+        .signature-footer {
+            text-align: center;
+            margin-top: 15px;
+            page-break-inside: avoid;
+            padding-bottom: 20px;
+        }
+
+        .signature-name {
+            margin-top: 40px;
+            font-weight: bold;
         }
 
         .digital-stamp {
@@ -172,6 +230,14 @@
             }
         }
 
+        /* Pastikan semua konten utama ada dalam satu halaman */
+        .main-content {
+            page-break-inside: avoid;
+            /* Hindari page break dengan menetapkan ukuran maksimum */
+            max-height: 9.5in;
+            /* Sesuaikan dengan tinggi halaman A4 dikurangi margin */
+        }
+
         /* Styling untuk Print */
         @media print {
             .web-only {
@@ -181,13 +247,18 @@
             body {
                 margin: 0;
                 padding: 0;
+                font-size: 9pt;
+                /* Sedikit mengurangi ukuran font untuk print */
             }
 
             .page-wrapper {
                 box-shadow: none;
-                padding-top: 0.5in;
+                padding-top: 0.3in;
+                /* Kurangi padding atas */
                 padding-left: 0.5in;
                 padding-right: 0.5in;
+                padding-bottom: 0.3in;
+                /* Kurangi padding bawah */
                 height: 100vh;
                 position: relative;
                 background: white;
@@ -236,10 +307,10 @@
 
         <hr style="margin: 10px 0;">
 
-        <h2>Surat Tugas</h2>
+        <h2 style="margin-top: 5px; margin-bottom: 5px;">Surat Tugas</h2>
         <p style="font-size: 10pt;
             text-align: center;
-            margin: 10px 0;">Nomor:
+            margin: 5px 0;">Nomor:
             {{ $perjalanan->nomor_surat }}</p>
 
         <p>Yang bertanda tangan dibawah ini, Direktur Politeknik Negeri Banyuwangi
@@ -266,7 +337,9 @@
                             {{ $ketua->nama }}
                             {{ $ketua->gelar_blk ? ', ' . $ketua->gelar_blk : '' }}
                         </td>
-                        <td><center>{{ $ketua->nip ?? ($ketua->nipppk ?? ($ketua->nik ?? '-')) }}</center></td>
+                        <td>
+                            <center>{{ $ketua->nip ?? ($ketua->nipppk ?? ($ketua->nik ?? '-')) }}</center>
+                        </td>
                         <td>{{ $ketua->id_staff }}</td>
                     </tr>
 
@@ -280,7 +353,9 @@
                                 {{ $pegawai->nama }}
                                 {{ $pegawai->gelar_blk ? ', ' . $pegawai->gelar_blk : '' }}
                             </td>
-                            <td><center>{{ $pegawai->nip ?? ($pegawai->nipppk ?? ($pegawai->nik ?? '-')) }}</center></td>
+                            <td>
+                                <center>{{ $pegawai->nip ?? ($pegawai->nipppk ?? ($pegawai->nik ?? '-')) }}</center>
+                            </td>
                             <td>{{ $pegawai->id_staff }}</td>
                         </tr>
                     @endforeach
@@ -325,43 +400,109 @@
             </tr>
         </table>
 
-        <p>Demikian Surat Tugas ini untuk dilaksanakan dengan penuh tanggung jawab, serta dipersipkan dengan
+        <p>Demikian Surat Tugas ini untuk dilaksanakan dengan penuh tanggung jawab, serta dipersiapkan dengan
             sebaik-baiknya.</p>
 
-        <div class="container">
-            <!-- Tabel Cuti -->
-            <div class="table-cuti">
+        <div class="main-content">
+            <div class="container">
+                <!-- Tabel Cuti -->
+                <div class="table-cuti">
+                    <!-- Kosong sesuai permintaan -->
+                </div>
 
-            </div>
-
-            <!-- Kolom Tanda Tangan Bertiga Vertikal -->
-            <div class="signatures">
-                <div class="ttd">
-                    <div class="sign">
-                        Banyuwangi, {{ date('d M Y', strtotime($perjalanan->created_at)) }}<br>
-                        {{ $direktur->jabatan->jabatan }},<br>
-                        <div class="digital-stamp">
-                            <div class="stamp-logo">
-                                <img src="{{ asset('assets/img/logo.png') }}" alt="Logo Instansi">
+                <!-- Kolom Tanda Tangan -->
+                <div class="signatures">
+                    <div class="ttd">
+                        <div class="sign" style="margin-bottom: 0;">
+                            Banyuwangi, {{ date('d M Y', strtotime($perjalanan->created_at)) }}<br>
+                            {{ $direktur->jabatan->jabatan }},<br>
+                            <div class="digital-stamp">
+                                <div class="stamp-logo">
+                                    <img src="{{ asset('assets/img/logo.png') }}" alt="Logo Instansi">
+                                </div>
+                                <div class="stamp-text">
+                                    Ditandatangani secara elektronik oleh<br>
+                                    Direktur Politeknik Negeri Banyuwangi<br>
+                                    selaku Pejabat yang Berwenang
+                                </div>
+                                <div>
+                                    <img src="data:image/svg+xml;base64,{{ base64_encode($qrCodeImage) }}"
+                                        alt="QR Code" style="width: 28px; height: 28px;" />
+                                </div>
                             </div>
-                            <div class="stamp-text">
-                                Ditandatangani secara elektronik oleh<br>
-                                Direktur Politeknik Negeri Banyuwangi<br>
-                                selaku Pejabat yang Berwenang
-                            </div>
-                            <div>
-                                <img src="data:image/svg+xml;base64,{{ base64_encode($qrCodeImage) }}" alt="QR Code"
-                                    style="width: 28px; height: 28px;" />
-                            </div>
+                            {{ $direktur->pegawai->gelar_dpn ?? '' }}{{ $direktur->pegawai->gelar_dpn ? ' ' : '' }}{{ $direktur->pegawai->nama }}{{ $direktur->pegawai->gelar_blk ? ', ' . $direktur->pegawai->gelar_blk : '' }}
+                            <br>
+                            NIP. {{ $direktur->pegawai->nip }}
                         </div>
-                        {{ $direktur->pegawai->gelar_dpn ?? '' }}{{ $direktur->pegawai->gelar_dpn ? ' ' : '' }}{{ $direktur->pegawai->nama }}{{ $direktur->pegawai->gelar_blk ? ', ' . $direktur->pegawai->gelar_blk : '' }}
-                        <br>
-                        NIP. {{ $direktur->pegawai->nip }}
                     </div>
                 </div>
             </div>
-        </div>
 
+            <!-- Garis horizontal memanjang -->
+            <div class="horizontal-line"></div>
+
+            <!-- 3 kolom tanda tangan tambahan sesuai gambar referensi -->
+            <div class="additional-signatures">
+                <!-- Kolom Kiri -->
+                <div class="additional-signature">
+                    <div class="signature-column">
+                        <div class="signature-row" style="margin-bottom: 9%">
+                            <div class="signature-label"></div>
+                            <div class="signature-colon"></div>
+                        </div>
+                        <div class="signature-row">
+                            <div class="signature-label">Tiba di</div>
+                            <div class="signature-colon">:</div>
+                        </div>
+                        <div class="signature-row">
+                            <div class="signature-label">Pada Tanggal</div>
+                            <div class="signature-colon">:</div>
+                        </div>
+                        <div class="signature-row">
+                            <div class="signature-label">Kepala,</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 40px;">
+                        <div>(..................................................)</div>
+                        <div>NIP</div>
+                    </div>
+                </div>
+
+                <!-- Kolom Tengah -->
+                <div class="additional-signature">
+                    <div class="signature-column">
+                        <div class="signature-row">
+                            <div class="signature-label">Berangkat dari</div>
+                            <div class="signature-colon">:</div>
+                        </div>
+                        <div class="signature-row">
+                            <div class="signature-label">Ke</div>
+                            <div class="signature-colon">:</div>
+                        </div>
+                        <div class="signature-row">
+                            <div class="signature-label">Pada Tanggal</div>
+                            <div class="signature-colon">:</div>
+                        </div>
+                        <div class="signature-row">
+                            <div class="signature-label">Kepala,</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 40px;">
+                        <div>(..................................................)</div>
+                        <div>NIP</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tanda tangan mengetahui dengan margin lebih compact -->
+            <div class="signature-footer">
+                <p style="margin: 3px 0;">Mengetahui,</p>
+                <p style="margin: 3px 0;">Pejabat Pembuat Komitmen,</p>
+                <p class="signature-name"> {{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}</p>
+                <p style="margin: 3px 0;">NIP {{$perjalanan->pejabat->pegawai->nip}}</p>
+            </div> <!-- Tutup .signature-footer -->
+
+        </div> <!-- Tutup .main-content -->
     </div> <!-- Tutup .page-wrapper -->
 
 </body>

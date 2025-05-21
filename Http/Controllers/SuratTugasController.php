@@ -12,6 +12,8 @@ use Modules\SuratTugas\Entities\AnggotaSuratTugas;
 use Modules\SuratTugas\Entities\DetailSuratTugas;
 use Modules\SuratTugas\Entities\SuratTugas;
 use Illuminate\Support\Str;
+use Modules\SuratTugas\Entities\LaporanSuratTugas;
+
 class SuratTugasController extends Controller
 {
     /**
@@ -97,97 +99,97 @@ class SuratTugasController extends Controller
      * @return Renderable
      */
     public function store(Request $request)
-{
-    $request->validate([
-        'nomor_surat' => 'required|unique:surat_tugas,nomor_surat',
-        'pejabat_id' => 'required|exists:pejabats,id',
-        'jenis' => 'required|in:individu,tim',
-        'jarak' => 'required|in:dalam_kota,luar_kota', // Added distance field
-    ]);
-
-    DB::beginTransaction();
-
-    try {
-        // Create main surat tugas record
-        $suratTugas = SuratTugas::create([
-            'nomor_surat' => $request->nomor_surat,
-            'pejabat_id' => $request->pejabat_id,
-            'jenis' => $request->jenis,
-            'jarak' => $request->jarak,
-            'access_token' => substr(Str::uuid(), 0, 12),
+    {
+        $request->validate([
+            'nomor_surat' => 'required|unique:surat_tugas,nomor_surat',
+            'pejabat_id' => 'required|exists:pejabats,id',
+            'jenis' => 'required|in:individu,tim',
+            'jarak' => 'required|in:dalam_kota,luar_kota', // Added distance field
         ]);
 
-        // Handle date range
-        $tanggalRange = explode(' to ', $request->tanggal);
-        $tanggalMulai = $tanggalRange[0];
-        $tanggalSelesai = $tanggalRange[1] ?? $tanggalRange[0];
+        DB::beginTransaction();
 
-        if ($request->jenis === 'individu') {
-            $request->validate([
-                'pegawai_id' => 'required|exists:pegawais,id',
-                'kegiatan_maksud' => 'required|string',
-                'tempat' => 'required|string',
+        try {
+            // Create main surat tugas record
+            $suratTugas = SuratTugas::create([
+                'nomor_surat' => $request->nomor_surat,
+                'pejabat_id' => $request->pejabat_id,
+                'jenis' => $request->jenis,
+                'jarak' => $request->jarak,
+                'access_token' => substr(Str::uuid(), 0, 12),
             ]);
 
-            $detailData = [
-                'surat_tugas_id' => $suratTugas->id,
-                'pegawai_id' => $request->pegawai_id,
-                'kegiatan_maksud' => $request->kegiatan_maksud,
-                'tanggal_mulai' => $tanggalMulai,
-                'tanggal_selesai' => $tanggalSelesai,
-                'tempat' => $request->tempat,
-            ];
+            // Handle date range
+            $tanggalRange = explode(' to ', $request->tanggal);
+            $tanggalMulai = $tanggalRange[0];
+            $tanggalSelesai = $tanggalRange[1] ?? $tanggalRange[0];
 
-            // Only add alat_angkutan for luar kota
-            if ($request->jarak === 'luar_kota') {
-                $request->validate(['alat_angkutan' => 'required|string']);
-                $detailData['alat_angkutan'] = $request->alat_angkutan;
-            }
+            if ($request->jenis === 'individu') {
+                $request->validate([
+                    'pegawai_id' => 'required|exists:pegawais,id',
+                    'kegiatan_maksud' => 'required|string',
+                    'tempat' => 'required|string',
+                ]);
 
-            DetailSuratTugas::create($detailData);
-        } else {
-            $request->validate([
-                'pegawai_id' => 'required|exists:pegawais,id',
-                'kegiatan_maksud' => 'required|string',
-                'lama_perjalanan' => 'required|integer|min:1',
-            ]);
+                $detailData = [
+                    'surat_tugas_id' => $suratTugas->id,
+                    'pegawai_id' => $request->pegawai_id,
+                    'kegiatan_maksud' => $request->kegiatan_maksud,
+                    'tanggal_mulai' => $tanggalMulai,
+                    'tanggal_selesai' => $tanggalSelesai,
+                    'tempat' => $request->tempat,
+                ];
 
-            $detailData = [
-                'surat_tugas_id' => $suratTugas->id,
-                'pegawai_id' => $request->pegawai_id,
-                'kegiatan_maksud' => $request->kegiatan_maksud,
-                'tanggal_mulai' => $tanggalMulai,
-                'tanggal_selesai' => $tanggalSelesai,
-                'tempat' => $request->tempat,
-                'lama_perjalanan' => $request->lama_perjalanan,
-            ];
+                // Only add alat_angkutan for luar kota
+                if ($request->jarak === 'luar_kota') {
+                    $request->validate(['alat_angkutan' => 'required|string']);
+                    $detailData['alat_angkutan'] = $request->alat_angkutan;
+                }
 
-            // Only add alat_angkutan for luar kota
-            if ($request->jarak === 'luar_kota') {
-                $request->validate(['alat_angkutan' => 'required|string']);
-                $detailData['alat_angkutan'] = $request->alat_angkutan;
-            }
+                DetailSuratTugas::create($detailData);
+            } else {
+                $request->validate([
+                    'pegawai_id' => 'required|exists:pegawais,id',
+                    'kegiatan_maksud' => 'required|string',
+                    'lama_perjalanan' => 'required|integer|min:1',
+                ]);
 
-            $detail = DetailSuratTugas::create($detailData);
+                $detailData = [
+                    'surat_tugas_id' => $suratTugas->id,
+                    'pegawai_id' => $request->pegawai_id,
+                    'kegiatan_maksud' => $request->kegiatan_maksud,
+                    'tanggal_mulai' => $tanggalMulai,
+                    'tanggal_selesai' => $tanggalSelesai,
+                    'tempat' => $request->tempat,
+                    'lama_perjalanan' => $request->lama_perjalanan,
+                ];
 
-            // Add team members if any
-            if ($request->has('anggota_ids')) {
-                foreach ($request->anggota_ids as $anggotaId) {
-                    AnggotaSuratTugas::create([
-                        'surat_tugas_id' => $suratTugas->id,
-                        'pegawai_id' => $anggotaId,
-                    ]);
+                // Only add alat_angkutan for luar kota
+                if ($request->jarak === 'luar_kota') {
+                    $request->validate(['alat_angkutan' => 'required|string']);
+                    $detailData['alat_angkutan'] = $request->alat_angkutan;
+                }
+
+                $detail = DetailSuratTugas::create($detailData);
+
+                // Add team members if any
+                if ($request->has('anggota_ids')) {
+                    foreach ($request->anggota_ids as $anggotaId) {
+                        AnggotaSuratTugas::create([
+                            'surat_tugas_id' => $suratTugas->id,
+                            'pegawai_id' => $anggotaId,
+                        ]);
+                    }
                 }
             }
-        }
 
-        DB::commit();
-        return redirect()->route('surattugas.index')->with('success', 'Surat Tugas berhasil dibuat.');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with('danger', 'Gagal membuat Surat Tugas: ' . $e->getMessage());
+            DB::commit();
+            return redirect()->route('surattugas.index')->with('success', 'Surat Tugas berhasil dibuat.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('danger', 'Gagal membuat Surat Tugas: ' . $e->getMessage());
+        }
     }
-}
 
     /**
      * Show the specified resource.
@@ -204,9 +206,28 @@ class SuratTugasController extends Controller
      * @param int $id
      * @return Renderable
      */
-    public function edit($id)
+    public function edit($access_token)
     {
-        return view('surattugas::edit');
+        // Get the surat tugas with all necessary relationships
+        $suratTugas = SuratTugas::with([
+            'pejabat',
+            'detail', // Main details (for both individu and tim)
+            'anggota' => function ($query) {
+                $query->with('pegawai'); // Load pegawai data for anggota
+            },
+            'laporan' // Include laporan if needed
+        ])->where('access_token', $access_token)
+            ->firstOrFail();
+
+        // Get all pegawai and pejabat for dropdowns
+        $pegawai = Pegawai::all();
+        $pejabat = Pejabat::with('pegawai')->get();
+
+        return view('surattugas::surattugas.edit', [
+            'suratTugas' => $suratTugas,
+            'pegawai' => $pegawai,
+            'pejabat' => $pejabat
+        ]);
     }
 
     /**
@@ -215,11 +236,121 @@ class SuratTugasController extends Controller
      * @param int $id
      * @return Renderable
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $access_token)
     {
-        //
+        // Find the surat tugas record
+        $suratTugas = SuratTugas::where('access_token', $access_token)->firstOrFail();
+
+        // Base validation rules
+        $validationRules = [
+            'jenis' => 'required|in:individu,tim',
+            'pejabat_id' => 'required|exists:pejabats,id',
+            'nomor_surat' => 'required|string|unique:surat_tugas,nomor_surat,' . $suratTugas->id,
+            'jarak' => 'required|in:dalam_kota,luar_kota',
+            'pegawai_id' => 'required|exists:pegawais,id',
+            'kegiatan_maksud' => 'required|string',
+            'tempat' => 'required|string',
+            'tanggal' => 'required|string', // Format: "YYYY-MM-DD to YYYY-MM-DD"
+            'lama_perjalanan' => 'nullable|integer|min:1',
+            'anggota_ids' => 'nullable|array',
+            'anggota_ids.*' => 'exists:pegawais,id',
+        ];
+
+        // Additional validation for luar kota
+        if ($request->jarak === 'luar_kota') {
+            $validationRules['alat_angkutan'] = 'required|string';
+        }
+
+        $request->validate($validationRules);
+
+        DB::beginTransaction();
+
+        try {
+            // Split date range
+            $dates = explode(' to ', $request->tanggal);
+            $tanggalMulai = $dates[0] ?? null;
+            $tanggalSelesai = $dates[1] ?? $dates[0];
+
+            // Update main surat tugas record
+            $suratTugas->update([
+                'nomor_surat' => $request->nomor_surat,
+                'pejabat_id' => $request->pejabat_id,
+                'jenis' => $request->jenis,
+                'jarak' => $request->jarak,
+            ]);
+
+            // Prepare detail data
+            $detailData = [
+                'pegawai_id' => $request->pegawai_id,
+                'kegiatan_maksud' => $request->kegiatan_maksud,
+                'tempat' => $request->tempat,
+                'tanggal_mulai' => $tanggalMulai,
+                'tanggal_selesai' => $tanggalSelesai,
+            ];
+
+            // Add alat_angkutan only for luar kota
+            if ($request->jarak === 'luar_kota') {
+                $detailData['alat_angkutan'] = $request->alat_angkutan;
+            }
+
+            // Add lama_perjalanan for tim
+            if ($request->jenis === 'tim') {
+                $detailData['lama_perjalanan'] = $request->lama_perjalanan;
+            }
+
+            // Update or create detail record
+            $suratTugas->detail()->updateOrCreate([], $detailData);
+
+            // Handle team members if jenis is tim
+            if ($request->jenis === 'tim') {
+                // Sync team members
+                $currentAnggotaIds = $suratTugas->anggota->pluck('pegawai_id')->toArray();
+                $newAnggotaIds = $request->anggota_ids ?? [];
+
+                // Remove members not in new selection
+                $toRemove = array_diff($currentAnggotaIds, $newAnggotaIds);
+                if (!empty($toRemove)) {
+                    $suratTugas->anggota()->whereIn('pegawai_id', $toRemove)->delete();
+                }
+
+                // Add new members
+                $toAdd = array_diff($newAnggotaIds, $currentAnggotaIds);
+                foreach ($toAdd as $pegawaiId) {
+                    $suratTugas->anggota()->create(['pegawai_id' => $pegawaiId]);
+                }
+            } else {
+                // Remove all anggota if changing from tim to individu
+                if ($suratTugas->jenis === 'tim') {
+                    $suratTugas->anggota()->delete();
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('surattugas.index')->with('success', 'Surat tugas berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('danger', 'Gagal memperbarui surat tugas: ' . $e->getMessage());
+        }
     }
 
+    public function upload(Request $request, $access_token)
+    {
+        $request->validate(['file_laporan' => 'required|mimes:pdf|max:10240']);
+
+        $suratTugas = SuratTugas::where('access_token', $access_token)->firstOrFail();
+        $path = $request->file('file_laporan')->store('laporan', 'public');
+
+        LaporanSuratTugas::updateOrCreate(
+            ['surat_tugas_id' => $suratTugas->id],
+            ['file_laporan' => $path, 'tanggal_upload' => now()]
+        );
+
+        return back()->with('success', 'Laporan berhasil diunggah!');
+    }
+    
     /**
      * Remove the specified resource from storage.
      * @param int $id

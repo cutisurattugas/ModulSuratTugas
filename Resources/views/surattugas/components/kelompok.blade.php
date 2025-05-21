@@ -25,7 +25,7 @@
     <div class="form-group row">
         <div class="col-md-6">
             <label for="jarak">Jenis Perjalanan</label>
-            <select name="jarak" class="form-control" required>
+            <select name="jarak" class="form-control" id="jarak_tim" required>
                 <option value="dalam_kota">Dalam Kota</option>
                 <option value="luar_kota">Luar Kota</option>
             </select>
@@ -61,9 +61,9 @@
             <label for="tanggal">Tanggal Perjalanan</label>
             <input type="text" name="tanggal" id="tanggal" class="form-control flatpickr" required>
         </div>
-        <div class="col-md-6" id="alat_angkutan_container" style="display: none;">
+        <div class="col-md-6" id="alat_angkutan_container_tim" style="display: none;">
             <label for="alat_angkutan">Alat Angkutan</label>
-            <select class="form-control" name="alat_angkutan" id="alat_angkutan">
+            <select class="form-control" name="alat_angkutan" id="alat_angkutan_tim">
                 <option value="">-- Pilih Angkutan --</option>
                 <option value="Bis">Bis</option>
                 <option value="Kereta">Kereta</option>

@@ -17,7 +17,8 @@ class CreateLaporanSuratTugasTable extends Migration
             $table->id();
             $table->unsignedBigInteger('surat_tugas_id');
             $table->string('file_laporan'); // Path file (PDF/doc)
-            $table->enum('penilaian', ['Dibawah Ekspektasi', 'Sesuai Ekspektasi', 'Diatas Ekspektasi'])->nullable();
+            $table->enum('predikat_penilaian', ['Dibawah Ekspektasi', 'Sesuai Ekspektasi', 'Diatas Ekspektasi'])->nullable();
+            $table->text('deskripsi_penilaian')->nullable();
             $table->timestamp('tanggal_upload')->nullable();
             $table->timestamps();
         });

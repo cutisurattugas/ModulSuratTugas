@@ -21,6 +21,6 @@ Route::prefix('surattugas')->group(function () {
         Route::get('/edit/{access_token}', 'SuratTugasController@edit')->name('surattugas.edit');
         Route::put('/update/{access_token}', 'SuratTugasController@update')->name('surattugas.update');
         Route::post('/laporan/upload/{access_token}', 'SuratTugasController@upload')->name('surattugas.upload');
-        Route::get('/printPerjadin/{access_token}', 'SuratTugasController@printPerjadin')->name('surattugas.print');
+        Route::get('/print/surattugas/{access_token}', 'SuratTugasController@printSuratTugas')->name('surattugas.print');
     });
 });

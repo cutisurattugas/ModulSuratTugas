@@ -28,7 +28,7 @@
                 <td class="text-center">
                     {{ $item->detail->kegiatan_maksud }}
                     @if($item->jarak == 'luar_kota' && $item->detail->alat_angkutan)
-                        <br><small class="text-muted">Alat: {{ $item->detail->alat_angkutan }}</small>
+                        <br><small class="text-muted">Angkutan: {{ $item->detail->alat_angkutan }}</small>
                     @endif
                 </td>
 

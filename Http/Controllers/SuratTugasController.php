@@ -13,6 +13,7 @@ use Modules\SuratTugas\Entities\DetailSuratTugas;
 use Modules\SuratTugas\Entities\SuratTugas;
 use Illuminate\Support\Str;
 use Modules\SuratTugas\Entities\LaporanSuratTugas;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SuratTugasController extends Controller
 {
@@ -350,14 +351,38 @@ class SuratTugasController extends Controller
 
         return back()->with('success', 'Laporan berhasil diunggah!');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      * @param int $id
      * @return Renderable
      */
-    public function destroy($id)
+    public function printSuratTugas($access_token)
     {
-        //
+        $data_direktur = Pejabat::where('jabatan_id', '1')->first();
+    
+        // Get surat tugas with all necessary relationships
+        $suratTugas = SuratTugas::with([
+            'pejabat.pegawai',
+            'detail.pegawai',
+            'anggota.pegawai',
+            'laporan'
+        ])->where('access_token', $access_token)->firstOrFail();
+
+        // Generate QR Code
+        $qrCodeUrl = url("https://prismfox.my.id");
+        $qrCodeImage = QrCode::format('svg')->size(100)->generate($qrCodeUrl);
+
+        // Pilih view berdasarkan JARAK, bukan jenis
+        $viewName = $suratTugas->jarak === 'dalam_kota'
+            ? 'surattugas::pdf.dalam_kota'
+            : 'surattugas::pdf.luar_kota';
+
+        return view($viewName, [
+            'perjalanan' => $suratTugas,
+            'qrCodeImage' => $qrCodeImage,
+            'detail' => $suratTugas->detail,
+            'direktur' => $data_direktur
+        ]);
     }
 }

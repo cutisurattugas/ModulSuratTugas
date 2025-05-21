@@ -242,26 +242,68 @@
             margin: 10px 0;">Nomor:
             {{ $perjalanan->nomor_surat }}</p>
 
-        <p>Yang bertanda tangan dibawah ini, {{ $perjalanan->pejabat->jabatan->jabatan }} Politeknik Negeri Banyuwangi
+        <p>Yang bertanda tangan dibawah ini, Direktur Politeknik Negeri Banyuwangi
             menugaskan Pegawai sebagai
             berikut:</p>
 
-        <table class="form">
-            <tr>
-                <td>Nama</td>
-                <td>:
-                    {{ $perjalanan->individu->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->individu->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->individu->pegawai->nama }}{{ $perjalanan->individu->pegawai->gelar_blk ? ', ' . $perjalanan->individu->pegawai->gelar_blk : '' }}
-                </td>
-            </tr>
-            <tr>
-                <td>NIP</td>
-                <td>: {{ $perjalanan->individu->pegawai->nip }}</td>
-            </tr>
-            <tr>
-                <td>Jabatan</td>
-                <td>: {{ $perjalanan->individu->pegawai->id_staff }}</td>
-            </tr>
-        </table>
+        @if ($perjalanan->anggota && count($perjalanan->anggota) > 0)
+            <table class="form" border="1" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <thead style="text-align: center;">
+                    <tr>
+                        <th style="width: 1%;">No</th>
+                        <th>Nama</th>
+                        <th>NIP / NIPPPK / NIK</th>
+                        <th>Jabatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{-- Baris Ketua Tim --}}
+                    @php $ketua = $perjalanan->detail->pegawai; @endphp
+                    <tr>
+                        <th style="width: 1%;">1</th>
+                        <td>
+                            {{ $ketua->gelar_dpn ? $ketua->gelar_dpn . ' ' : '' }}
+                            {{ $ketua->nama }}
+                            {{ $ketua->gelar_blk ? ', ' . $ketua->gelar_blk : '' }}
+                        </td>
+                        <td><center>{{ $ketua->nip ?? ($ketua->nipppk ?? ($ketua->nik ?? '-')) }}</center></td>
+                        <td>{{ $ketua->id_staff }}</td>
+                    </tr>
+
+                    {{-- Baris Anggota Tim --}}
+                    @foreach ($perjalanan->anggota as $index => $item)
+                        @php $pegawai = $item->pegawai; @endphp
+                        <tr>
+                            <th style="width: 1%;">{{ $index + 2 }}</th>
+                            <td>
+                                {{ $pegawai->gelar_dpn ? $pegawai->gelar_dpn . ' ' : '' }}
+                                {{ $pegawai->nama }}
+                                {{ $pegawai->gelar_blk ? ', ' . $pegawai->gelar_blk : '' }}
+                            </td>
+                            <td><center>{{ $pegawai->nip ?? ($pegawai->nipppk ?? ($pegawai->nik ?? '-')) }}</center></td>
+                            <td>{{ $pegawai->id_staff }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <table class="form">
+                <tr>
+                    <td>Nama</td>
+                    <td>:
+                        {{ $perjalanan->detail->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->detail->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->detail->pegawai->nama }}{{ $perjalanan->detail->pegawai->gelar_blk ? ', ' . $perjalanan->detail->pegawai->gelar_blk : '' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>NIP</td>
+                    <td>: {{ $perjalanan->detail->pegawai->nip }}</td>
+                </tr>
+                <tr>
+                    <td>Jabatan</td>
+                    <td>: {{ $perjalanan->detail->pegawai->id_staff }}</td>
+                </tr>
+            </table>
+        @endif
 
         <p>ditugaskan untuk mengikuti:</p>
 
@@ -269,17 +311,17 @@
             <tr>
                 <td>Kegiatan</td>
                 <td>:
-                    {{ $perjalanan->individu->kegiatan }}
+                    {{ $perjalanan->detail->kegiatan_maksud }}
                 </td>
             </tr>
             <tr>
                 <td>Waktu</td>
-                <td>: {{ date('d M Y', strtotime($perjalanan->individu->tanggal_mulai)) }} -
-                    {{ date('d M Y', strtotime($perjalanan->individu->tanggal_selesai)) }}</td>
+                <td>: {{ date('d M Y', strtotime($perjalanan->detail->tanggal_mulai)) }} -
+                    {{ date('d M Y', strtotime($perjalanan->detail->tanggal_selesai)) }}</td>
             </tr>
             <tr>
                 <td>Tempat</td>
-                <td>: {{ $perjalanan->individu->tempat }}</td>
+                <td>: {{ $perjalanan->detail->tempat }}</td>
             </tr>
         </table>
 
@@ -297,7 +339,7 @@
                 <div class="ttd">
                     <div class="sign">
                         Banyuwangi, {{ date('d M Y', strtotime($perjalanan->created_at)) }}<br>
-                        {{ $perjalanan->pejabat->jabatan->jabatan }},<br>
+                        {{ $direktur->jabatan->jabatan }},<br>
                         <div class="digital-stamp">
                             <div class="stamp-logo">
                                 <img src="{{ asset('assets/img/logo.png') }}" alt="Logo Instansi">
@@ -307,24 +349,15 @@
                                 Direktur Politeknik Negeri Banyuwangi<br>
                                 selaku Pejabat yang Berwenang
                             </div>
+                            <div>
+                                <img src="data:image/svg+xml;base64,{{ base64_encode($qrCodeImage) }}" alt="QR Code"
+                                    style="width: 28px; height: 28px;" />
+                            </div>
                         </div>
-                        {{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}
+                        {{ $direktur->pegawai->gelar_dpn ?? '' }}{{ $direktur->pegawai->gelar_dpn ? ' ' : '' }}{{ $direktur->pegawai->nama }}{{ $direktur->pegawai->gelar_blk ? ', ' . $direktur->pegawai->gelar_blk : '' }}
                         <br>
-                        NIP. {{ $perjalanan->pejabat->pegawai->nip }}
+                        NIP. {{ $direktur->pegawai->nip }}
                     </div>
-                </div>
-            </div>
-        </div>
-        <!-- Footer dengan QR Code -->
-        <div class="footer">
-            <div style="display: flex; align-items: center;">
-                <!-- Contoh QR Code Placeholder -->
-                <img src="data:image/svg+xml;base64,{{ base64_encode($qrCodeImage) }}" alt="QR Code"
-                    style="width: 50px; height: 50px;" />
-
-                <div class="signature-info">
-                    Surat ini sudah ditandatangani secara digital,<br>
-                    sehingga tidak perlu tanda tangan basah dan stempel.
                 </div>
             </div>
         </div>

@@ -13,7 +13,8 @@ class LaporanSuratTugas extends Model
     protected $fillable = [
         'surat_tugas_id',
         'file_laporan',
-        'penilaian',
+        'predikat_penilaian',
+        'deskripsi_penilaian',
         'tanggal_upload'
     ];
 

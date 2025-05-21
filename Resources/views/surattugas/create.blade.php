@@ -1,5 +1,5 @@
 @extends('adminlte::page')
-@section('title', 'Tambah Dinas Luar')
+@section('title', 'Tambah Surat Tugas')
 
 @section('css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -7,7 +7,7 @@
 @endsection
 
 @section('content_header')
-    <h1 class="m-0 text-dark">Tambah Pengajuan Dinas Luar</h1>
+    <h1 class="m-0 text-dark">Tambah Pengajuan Surat Tugas</h1>
 @endsection
 
 @section('content')
@@ -26,7 +26,7 @@
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="kelompok-tab" data-bs-toggle="tab" data-bs-target="#kelompok"
                                 type="button" role="tab" aria-controls="kelompok" aria-selected="false">
-                                Surat Tugas Kelompok
+                                Surat Tugas Tim
                             </button>
                         </li>
                     </ul>
@@ -77,19 +77,43 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Show/hide alat angkutan based on jarak selection
-            const jarakSelect = document.querySelector('select[name="jarak"]');
-            const alatAngkutanContainer = document.getElementById('alat_angkutan_container');
+            // Mapping form IDs
+            const forms = [{
+                    jarakId: 'jarak_individu',
+                    containerId: 'alat_angkutan_container_individu',
+                    selectId: 'alat_angkutan_individu'
+                },
+                {
+                    jarakId: 'jarak_tim',
+                    containerId: 'alat_angkutan_container_tim',
+                    selectId: 'alat_angkutan_tim'
+                }
+            ];
 
-            jarakSelect.addEventListener('change', function() {
-                alatAngkutanContainer.style.display = this.value === 'luar_kota' ? 'block' : 'none';
-                if (this.value !== 'luar_kota') {
-                    document.getElementById('alat_angkutan').value = '';
+            forms.forEach(({
+                jarakId,
+                containerId,
+                selectId
+            }) => {
+                const jarakSelect = document.getElementById(jarakId);
+                const alatAngkutanContainer = document.getElementById(containerId);
+                const alatAngkutanSelect = document.getElementById(selectId);
+
+                if (jarakSelect && alatAngkutanContainer && alatAngkutanSelect) {
+                    jarakSelect.addEventListener('change', function() {
+                        if (this.value === 'luar_kota') {
+                            alatAngkutanContainer.style.display = 'block';
+                        } else {
+                            alatAngkutanContainer.style.display = 'none';
+                            alatAngkutanSelect.value = '';
+                        }
+                    });
+
+                    // Trigger once on page load
+                    jarakSelect.dispatchEvent(new Event('change'));
                 }
             });
-
-            // Trigger change event on page load if needed
-            jarakSelect.dispatchEvent(new Event('change'));
         });
     </script>
+
 @endsection

@@ -14,7 +14,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('surattugas')->group(function () {
-    Route::prefix('kelola')->group(function () {
+    Route::prefix('perjadin')->group(function () {
         Route::get('/', 'SuratTugasController@index')->name('surattugas.index');
         Route::get('/create', 'SuratTugasController@create')->name('surattugas.create');
         Route::post('/store', 'SuratTugasController@store')->name('surattugas.store');

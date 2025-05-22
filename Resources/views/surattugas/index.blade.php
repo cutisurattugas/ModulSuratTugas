@@ -10,9 +10,9 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h1>Surat Tugas</h1>
+                    <h1>Surat Tugas Perjalanan Dinas</h1>
                     <div class="lead">
-                        Kelola surat tugas.
+                        Kelola surat tugas perjalanan dinas.
                         @if (auth()->user()->role_aktif === 'admin')
                             <a href="{{ route('surattugas.create') }}" class="btn btn-primary btn-sm float-right">Buat Surat</a>
                         @endif

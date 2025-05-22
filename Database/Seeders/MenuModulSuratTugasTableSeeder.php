@@ -30,13 +30,49 @@ class MenuModulSuratTugasTableSeeder extends Seeder
         if ($menu) {
             Menu::create([
                 'modul' => 'SuratTugas',
-                'label' => 'Kelola',
-                'url' => 'surattugas/kelola',
+                'label' => 'Perjalanan Dinas',
+                'url' => 'surattugas/perjadin',
                 'can' => serialize(['admin']),
                 'icon' => 'far fa-circle',
                 'urut' => 2,
                 'parent_id' => $menu->id,
-                'active' => serialize(['surattugas/kelola', 'surattugas/kelola*']),
+                'active' => serialize(['surattugas/perjadin', 'surattugas/perjadin*']),
+            ]);
+        }
+        if ($menu) {
+            Menu::create([
+                'modul' => 'SuratTugas',
+                'label' => 'Kepanitiaan',
+                'url' => 'surattugas/kepanitiaan',
+                'can' => serialize(['admin']),
+                'icon' => 'far fa-circle',
+                'urut' => 3,
+                'parent_id' => $menu->id,
+                'active' => serialize(['surattugas/kepanitiaan', 'surattugas/kepanitiaan*']),
+            ]);
+        }
+        if ($menu) {
+            Menu::create([
+                'modul' => 'SuratTugas',
+                'label' => 'Rekap Perjalanan Dinas',
+                'url' => 'surattugas/rekap-perjadin',
+                'can' => serialize(['admin']),
+                'icon' => 'far fa-circle',
+                'urut' => 4,
+                'parent_id' => $menu->id,
+                'active' => serialize(['surattugas/rekap-perjadin', 'surattugas/rekap-perjadin*']),
+            ]);
+        }
+        if ($menu) {
+            Menu::create([
+                'modul' => 'SuratTugas',
+                'label' => 'Rekap Kepanitiaan',
+                'url' => 'surattugas/rekap-kepanitiaan',
+                'can' => serialize(['admin']),
+                'icon' => 'far fa-circle',
+                'urut' => 5,
+                'parent_id' => $menu->id,
+                'active' => serialize(['surattugas/rekap-kepanitiaan', 'surattugas/rekap-kepanitiaan*']),
             ]);
         }
     }

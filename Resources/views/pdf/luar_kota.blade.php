@@ -130,7 +130,7 @@
         }
 
         .stamp-logo img {
-            width: 28px;
+            width: 50px;
             height: auto;
         }
 
@@ -266,7 +266,7 @@
                             {{ $ketua->nama }}
                             {{ $ketua->gelar_blk ? ', ' . $ketua->gelar_blk : '' }}
                         </td>
-                        <td>{{ $ketua->nip ?? ($ketua->nipppk ?? ($ketua->nik ?? '-')) }}</td>
+                        <td><center>{{ $ketua->nip ?? ($ketua->nipppk ?? ($ketua->nik ?? '-')) }}</center></td>
                         <td>{{ $ketua->id_staff }}</td>
                     </tr>
 
@@ -280,7 +280,7 @@
                                 {{ $pegawai->nama }}
                                 {{ $pegawai->gelar_blk ? ', ' . $pegawai->gelar_blk : '' }}
                             </td>
-                            <td>{{ $pegawai->nip ?? ($pegawai->nipppk ?? ($pegawai->nik ?? '-')) }}</td>
+                            <td><center>{{ $pegawai->nip ?? ($pegawai->nipppk ?? ($pegawai->nik ?? '-')) }}</center></td>
                             <td>{{ $pegawai->id_staff }}</td>
                         </tr>
                     @endforeach
@@ -351,7 +351,7 @@
                             </div>
                             <div>
                                 <img src="data:image/svg+xml;base64,{{ base64_encode($qrCodeImage) }}" alt="QR Code"
-                                    style="width: 28px; height: 28px;" />
+                                    style="width: 45px; height: 45px;" />
                             </div>
                         </div>
                         {{ $direktur->pegawai->gelar_dpn ?? '' }}{{ $direktur->pegawai->gelar_dpn ? ' ' : '' }}{{ $direktur->pegawai->nama }}{{ $direktur->pegawai->gelar_blk ? ', ' . $direktur->pegawai->gelar_blk : '' }}
@@ -363,7 +363,7 @@
         </div>
 
     </div> <!-- Tutup .page-wrapper -->
-
+    
 </body>
 
 </html>

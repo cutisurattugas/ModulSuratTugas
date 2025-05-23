@@ -72,6 +72,16 @@
         </div>
     </div>
 
+    <div class="form-group row" id="kota_fields_individu" style="display: none;">
+        <div class="col-md-6">
+            <label>Kota Keberangkatan</label>
+            <input type="text" name="kota_keberangkatan" class="form-control">
+        </div>
+        <div class="col-md-6">
+            <label>Kota Tujuan</label>
+            <input type="text" name="kota_tujuan" class="form-control">
+        </div>
+    </div>
     <button type="submit" class="btn btn-primary">Simpan</button>
     <a href="{{ route('surattugas.index') }}" class="btn btn-default">Kembali</a>
 </form>

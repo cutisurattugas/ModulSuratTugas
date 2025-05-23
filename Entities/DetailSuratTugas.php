@@ -19,6 +19,8 @@ class DetailSuratTugas extends Model
         'tempat',
         'alat_angkutan', // nullable (hanya untuk luar kota)
         'lama_perjalanan', // nullable (hanya untuk tim)
+        'kota_keberangkatan',
+        'kota_tujuan',
     ];
 
     // Relasi ke SuratTugas

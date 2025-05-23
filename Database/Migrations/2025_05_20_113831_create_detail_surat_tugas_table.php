@@ -23,6 +23,8 @@ class CreateDetailSuratTugasTable extends Migration
             $table->string('tempat');
             $table->string('alat_angkutan')->nullable(); // Hanya diisi jika jarak = luar_kota
             $table->integer('lama_perjalanan')->nullable(); // Hanya untuk tim
+            $table->string('kota_keberangkatan')->nullable(); // Misal: "Surabaya"
+            $table->string('kota_tujuan')->nullable();
             $table->foreign('surat_tugas_id')->references('id')->on('surat_tugas')->onDelete('cascade');
             $table->foreign('pegawai_id')->references('id')->on('pegawais')->onDelete('cascade');
             $table->timestamps();

@@ -27,7 +27,7 @@
                 {{-- Tujuan / Kegiatan --}}
                 <td class="text-center">
                     {{ $item->detail->kegiatan_maksud }}
-                    @if($item->jarak == 'luar_kota' && $item->detail->alat_angkutan)
+                    @if ($item->jarak == 'luar_kota' && $item->detail->alat_angkutan)
                         <br><small class="text-muted">Angkutan: {{ $item->detail->alat_angkutan }}</small>
                     @endif
                 </td>
@@ -36,7 +36,7 @@
                 <td class="text-center">
                     {{ date('d M Y', strtotime($item->detail->tanggal_mulai)) }} -
                     {{ date('d M Y', strtotime($item->detail->tanggal_selesai)) }}
-                    @if($mode == 'kelompok')
+                    @if ($mode == 'kelompok')
                         <br><small class="text-muted">({{ $item->detail->lama_perjalanan }} hari)</small>
                     @endif
                 </td>
@@ -46,7 +46,7 @@
                     <a class="btn btn-success btn-sm" href="{{ route('surattugas.print', $item->access_token) }}">
                         <i class="nav-icon fas fa-print"></i>
                     </a>
-                    
+
                     @if ($mode === 'kelompok')
                         <button class="btn btn-secondary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#modalPelaksana{{ $item->id }}">
@@ -54,23 +54,28 @@
                         </button>
                     @endif
 
-                    @if (auth()->user()->role_aktif !== 'admin')
+                    @php
+                        $rolesCanView = ['admin', 'direktur', 'pegawai', 'dosen', 'keuangan'];
+                        $rolesCanUpload = ['pegawai', 'dosen'];
+                    @endphp
+
+                    @if (in_array(auth()->user()->role_aktif, $rolesCanView))
                         @if ($item->laporan)
                             <a href="{{ Storage::url($item->laporan->file_laporan) }}" class="btn btn-info btn-sm"
                                 target="_blank">
                                 <i class="nav-icon fas fa-file-pdf"></i> Laporan
                             </a>
-                        @else
+                        @elseif (in_array(auth()->user()->role_aktif, $rolesCanUpload))
                             <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#modalUploadLaporan{{ $item->access_token }}">
                                 <i class="nav-icon fas fa-arrow-circle-up"></i>
                             </button>
                         @endif
                     @endif
-                    
+
+
                     @if (auth()->user()->role_aktif === 'admin')
-                        <a href="{{ route('surattugas.edit', $item->access_token) }}"
-                            class="btn btn-warning btn-sm">
+                        <a href="{{ route('surattugas.edit', $item->access_token) }}" class="btn btn-warning btn-sm">
                             <i class="nav-icon fas fa-edit"></i>
                         </a>
                     @endif
@@ -121,16 +126,15 @@
                             enctype="multipart/form-data">
                             @csrf
                             <div class="modal-header">
-                                <h5 class="modal-title"
-                                    id="modalUploadLaporanLabel{{ $item->access_token }}">Unggah
+                                <h5 class="modal-title" id="modalUploadLaporanLabel{{ $item->access_token }}">Unggah
                                     Laporan</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label for="file_laporan{{ $item->access_token }}"
-                                        class="form-label">Pilih File Laporan</label>
+                                    <label for="file_laporan{{ $item->access_token }}" class="form-label">Pilih File
+                                        Laporan</label>
                                     <input type="file" name="file_laporan" class="form-control"
                                         id="file_laporan{{ $item->access_token }}" required>
                                     <small class="text-muted">Format: PDF, DOCX | Max: 10MB</small>

@@ -69,3 +69,21 @@
         </select>
     </div>
 </div>
+
+<div class="form-group row" id="kota_fields_individu" style="{{ $suratTugas->jarak == 'luar_kota' ? 'display: flex;' : 'display: none;' }}">
+    <!-- Kota Keberangkatan -->
+    <div class="col-md-6">
+        <label for="kota_keberangkatan">Kota Keberangkatan</label>
+        <input type="text" name="kota_keberangkatan" class="form-control"
+               value="{{ old('kota_keberangkatan', optional($suratTugas->detail)->kota_keberangkatan) }}"
+               placeholder="Contoh: Surabaya">
+    </div>
+
+    <!-- Kota Tujuan -->
+    <div class="col-md-6">
+        <label for="kota_tujuan">Kota Tujuan</label>
+        <input type="text" name="kota_tujuan" class="form-control"
+               value="{{ old('kota_tujuan', optional($suratTugas->detail)->kota_tujuan) }}"
+               placeholder="Contoh: Banyuwangi">
+    </div>
+</div>

@@ -77,40 +77,51 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Mapping form IDs
+            // Fungsi Toggle Alat Angkutan & Kota Keberangkatan/Tujuan
             const forms = [{
                     jarakId: 'jarak_individu',
-                    containerId: 'alat_angkutan_container_individu',
-                    selectId: 'alat_angkutan_individu'
+                    alatContainerId: 'alat_angkutan_container_individu',
+                    alatSelectId: 'alat_angkutan_individu',
+                    kotaFieldsId: 'kota_fields_individu'
                 },
                 {
                     jarakId: 'jarak_tim',
-                    containerId: 'alat_angkutan_container_tim',
-                    selectId: 'alat_angkutan_tim'
+                    alatContainerId: 'alat_angkutan_container_tim',
+                    alatSelectId: 'alat_angkutan_tim',
+                    kotaFieldsId: 'kota_fields_kelompok'
                 }
             ];
 
             forms.forEach(({
                 jarakId,
-                containerId,
-                selectId
+                alatContainerId,
+                alatSelectId,
+                kotaFieldsId
             }) => {
                 const jarakSelect = document.getElementById(jarakId);
-                const alatAngkutanContainer = document.getElementById(containerId);
-                const alatAngkutanSelect = document.getElementById(selectId);
+                const alatAngkutanContainer = document.getElementById(alatContainerId);
+                const alatAngkutanSelect = document.getElementById(alatSelectId);
+                const kotaFields = document.getElementById(kotaFieldsId);
 
-                if (jarakSelect && alatAngkutanContainer && alatAngkutanSelect) {
-                    jarakSelect.addEventListener('change', function() {
-                        if (this.value === 'luar_kota') {
-                            alatAngkutanContainer.style.display = 'block';
-                        } else {
-                            alatAngkutanContainer.style.display = 'none';
-                            alatAngkutanSelect.value = '';
+                if (jarakSelect && alatAngkutanContainer && kotaFields) {
+                    function updateFields() {
+                        const isLuarKota = jarakSelect.value === 'luar_kota';
+
+                        // Tampilkan/menghilangkan field sesuai kondisi
+                        alatAngkutanContainer.style.display = isLuarKota ? 'block' : 'none';
+                        kotaFields.style.display = isLuarKota ? 'flex' : 'none';
+
+                        // Reset value jika tidak dalam kondisi luar_kota
+                        if (!isLuarKota) {
+                            if (alatAngkutanSelect) alatAngkutanSelect.value = '';
                         }
-                    });
+                    }
 
-                    // Trigger once on page load
-                    jarakSelect.dispatchEvent(new Event('change'));
+                    // Jalankan saat halaman pertama kali dimuat
+                    updateFields();
+
+                    // Event listener
+                    jarakSelect.addEventListener('change', updateFields);
                 }
             });
         });

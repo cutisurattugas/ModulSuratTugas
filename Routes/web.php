@@ -24,3 +24,7 @@ Route::prefix('surattugas')->group(function () {
         Route::get('/print/surattugas/{access_token}', 'SuratTugasController@printSuratTugas')->name('surattugas.print');
     });
 });
+
+Route::get('/tes', function(){
+    return view('surattugas::surattugas.tes');
+});

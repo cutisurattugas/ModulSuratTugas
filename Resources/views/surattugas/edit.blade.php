@@ -72,23 +72,52 @@
             });
 
             // Show/hide alat angkutan based on jarak selection
-            const jarakSelect = document.querySelector('select[name="jarak"]');
-            if (jarakSelect) {
-                const alatAngkutanContainer = document.getElementById('alat_angkutan_container');
-                
-                jarakSelect.addEventListener('change', function() {
-                    if (alatAngkutanContainer) {
-                        alatAngkutanContainer.style.display = this.value === 'luar_kota' ? 'block' : 'none';
-                        if (this.value !== 'luar_kota') {
-                            const alatAngkutan = document.getElementById('alat_angkutan');
+            const forms = [{
+                jarakId: 'jarak_individu',
+                alatContainerId: 'alat_angkutan_container',
+                kotaFieldsId: 'kota_fields_individu'
+            }, {
+                jarakId: 'jarak_kelompok',
+                alatContainerId: 'alat_angkutan_container',
+                kotaFieldsId: 'kota_fields_kelompok'
+            }];
+
+            forms.forEach(({
+                jarakId,
+                alatContainerId,
+                kotaFieldsId
+            }) => {
+                const jarakSelect = document.getElementById(jarakId);
+                const alatAngkutanContainer = document.getElementById(alatContainerId);
+                const kotaFields = document.getElementById(kotaFieldsId);
+
+                if (jarakSelect && alatAngkutanContainer && kotaFields) {
+                    function updateFields() {
+                        const isLuarKota = jarakSelect.value === 'luar_kota';
+
+                        // Tampilkan/menghilangkan field sesuai kondisi
+                        alatAngkutanContainer.style.display = isLuarKota ? 'block' : 'none';
+                        kotaFields.style.display = isLuarKota ? 'flex' : 'none';
+
+                        // Reset value jika dalam_kota
+                        if (!isLuarKota) {
+                            const alatAngkutan = alatAngkutanContainer.querySelector('select');
+                            const kotaKeberangkatan = kotaFields.querySelector('input[name="kota_keberangkatan"]');
+                            const kotaTujuan = kotaFields.querySelector('input[name="kota_tujuan"]');
+
                             if (alatAngkutan) alatAngkutan.value = '';
+                            if (kotaKeberangkatan) kotaKeberangkatan.value = '';
+                            if (kotaTujuan) kotaTujuan.value = '';
                         }
                     }
-                });
 
-                // Trigger initial state
-                jarakSelect.dispatchEvent(new Event('change'));
-            }
+                    // Jalankan sekali saat halaman dimuat
+                    updateFields();
+
+                    // Event listener
+                    jarakSelect.addEventListener('change', updateFields);
+                }
+            });
         });
     </script>
 @endsection

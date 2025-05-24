@@ -23,6 +23,12 @@ Route::prefix('surattugas')->group(function () {
         Route::post('/laporan/upload/{access_token}', 'SuratTugasController@upload')->name('surattugas.upload');
         Route::get('/print/surattugas/{access_token}', 'SuratTugasController@printSuratTugas')->name('surattugas.print');
     });
+    Route::prefix('rekap-perjadin')->group(function () {
+        Route::get('/', 'RekapPerjadinController@index')->name('rekap.index');
+        Route::get('/export/pdf', 'RekapPerjadinController@exportPdf')->name('rekap.exportPdf');
+        Route::get('/export/excel', 'RekapPerjadinController@exportExcel')->name('rekap.exportExcel');
+    });
+
 });
 
 Route::get('/tes', function(){

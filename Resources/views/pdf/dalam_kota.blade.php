@@ -498,6 +498,7 @@
             <div class="signature-footer">
                 <p style="margin: 3px 0;">Mengetahui,</p>
                 <p style="margin: 3px 0;">Pejabat Pembuat Komitmen,</p>
+                <br><br>
                 <p class="signature-name"> {{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}</p>
                 <p style="margin: 3px 0;">NIP {{$perjalanan->pejabat->pegawai->nip}}</p>
             </div> <!-- Tutup .signature-footer -->

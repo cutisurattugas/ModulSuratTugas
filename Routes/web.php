@@ -31,6 +31,4 @@ Route::prefix('surattugas')->group(function () {
 
 });
 
-Route::get('/tes', function(){
-    return view('surattugas::surattugas.tes');
-});
+Route::get('/scan-surattugas/{access_token}', 'SuratTugasController@scanSuratTugas')->name('surattugas.scan');

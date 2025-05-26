@@ -359,7 +359,7 @@ class SuratTugasController extends Controller
         ])->where('access_token', $access_token)->firstOrFail();
 
         // Generate QR Code
-        $qrCodeUrl = url("https://prismfox.my.id");
+        $qrCodeUrl = url("/scan-surattugas/" . $suratTugas->access_token);
         $qrCodeImage = QrCode::format('svg')->size(100)->generate($qrCodeUrl);
 
         // Pilih view berdasarkan JARAK, bukan jenis
@@ -370,6 +370,25 @@ class SuratTugasController extends Controller
         return view($viewName, [
             'perjalanan' => $suratTugas,
             'qrCodeImage' => $qrCodeImage,
+            'detail' => $suratTugas->detail,
+            'direktur' => $data_direktur
+        ]);
+    }
+
+    public function scanSuratTugas($access_token)
+    {
+        $data_direktur = Pejabat::where('jabatan_id', '1')->first();
+
+        // Get surat tugas with all necessary relationships
+        $suratTugas = SuratTugas::with([
+            'pejabat.pegawai',
+            'detail.pegawai',
+            'anggota.pegawai',
+            'laporan'
+        ])->where('access_token', $access_token)->firstOrFail();
+
+        return view('surattugas::surattugas.scan',  [
+            'perjalanan' => $suratTugas,
             'detail' => $suratTugas->detail,
             'direktur' => $data_direktur
         ]);

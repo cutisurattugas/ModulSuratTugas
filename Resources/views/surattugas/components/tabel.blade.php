@@ -26,7 +26,7 @@
 
                 {{-- Tujuan / Kegiatan --}}
                 <td class="text-center">
-                    {{ $item->detail->kegiatan_maksud }}
+                    <a href="{{route('surattugas.scan', $item->access_token)}}" style="color: black">{{ $item->detail->kegiatan_maksud }}</a>
                     @if ($item->jarak == 'luar_kota' && $item->detail->alat_angkutan)
                         <br><small class="text-muted">Angkutan: {{ $item->detail->alat_angkutan }}</small>
                     @endif

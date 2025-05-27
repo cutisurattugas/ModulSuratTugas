@@ -30,10 +30,6 @@ class SuratTugasController extends Controller
         $pegawai = Pegawai::where('username', $user->username)->first();
         $pegawai_id = optional($pegawai)->id;
 
-        // Ambil data pejabat (jika ada)
-        $pejabat = Pejabat::where('pegawai_id', $pegawai_id)->first();
-        $pejabat_id = optional($pejabat)->id;
-
         // Query dasar dengan relasi
         $query = SuratTugas::with([
             'pejabat',
@@ -43,28 +39,58 @@ class SuratTugasController extends Controller
             'laporan'
         ]);
 
-        // Filter berdasarkan role
-        if ($role === 'admin') {
-            // Admin bisa lihat semua data
-            $surat_tugas = $query->latest()->get();
-        } elseif (in_array($role, ['direktur', 'wadir1', 'wadir2', 'wadir3'])) {
-            // Pejabat hanya lihat surat yang mereka tanda tangani
-            $surat_tugas = $query->where('pejabat_id', $pejabat_id)
-                ->latest()
-                ->get();
-        } elseif (in_array($role, ['pegawai', 'dosen', 'staf'])) {
-            // Pegawai biasa hanya melihat:
-            // 1. Surat tugas individu dimana dia sebagai pelaksana
-            // 2. Surat tugas tim dimana dia sebagai KETUA TIM (bukan anggota)
+        // Inisialisasi variabel
+        $surat_tugas = collect(); // Default kosong
 
-            $surat_tugas = $query->where(function ($q) use ($pegawai_id) {
-                // Surat tugas individu (dia sebagai pelaksana)
+        if ($role === 'admin') {
+            // Admin: lihat semua surat tugas
+            $surat_tugas = $query->latest()->get();
+        } elseif ($role === 'direktur') {
+            // Direktur: lihat semua surat tugas (tanpa filter sama sekali)
+            $surat_tugas = $query->latest()->get();
+        } elseif ($role === 'wadir2') {
+            // Wadir2:
+            // - Bisa lihat semua surat seperti direktur
+            // - DAN tambahan surat yang dia terlibat (individu/tim)
+
+            // Ambil semua surat (seperti direktur)
+            $semua_surat = $query->get();
+
+            // Ambil surat yang terlibat sebagai pelaksana (individu/tim)
+            $milik_sendiri = SuratTugas::with([
+                'pejabat',
+                'detail',
+                'detail.pegawai',
+                'anggota.pegawai',
+                'laporan'
+            ])->where(function ($q) use ($pegawai_id) {
+                // Individu
                 $q->where('jenis', 'individu')
                     ->whereHas('detail', function ($q2) use ($pegawai_id) {
                         $q2->where('pegawai_id', $pegawai_id);
                     });
 
-                // ATAU Surat tugas tim (dia sebagai ketua tim)
+                // Atau Tim
+                $q->orWhere(function ($q3) use ($pegawai_id) {
+                    $q3->where('jenis', 'tim')
+                        ->whereHas('detail', function ($q4) use ($pegawai_id) {
+                            $q4->where('pegawai_id', $pegawai_id);
+                        });
+                });
+            })->get();
+
+            // Gabungkan dan hilangkan duplikasi
+            $surat_tugas = $semua_surat->merge($milik_sendiri)->unique('id');
+        } elseif (in_array($role, ['pegawai', 'dosen', 'staf'])) {
+            // Pegawai biasa hanya lihat surat tugas individu & tim yang dia terlibat
+            $surat_tugas = $query->where(function ($q) use ($pegawai_id) {
+                // Surat individu dimana dia pelaksana
+                $q->where('jenis', 'individu')
+                    ->whereHas('detail', function ($q2) use ($pegawai_id) {
+                        $q2->where('pegawai_id', $pegawai_id);
+                    });
+
+                // ATAU Surat tim dimana dia sebagai ketua (bukan sekadar anggota)
                 $q->orWhere(function ($q3) use ($pegawai_id) {
                     $q3->where('jenis', 'tim')
                         ->whereHas('detail', function ($q4) use ($pegawai_id) {
@@ -80,7 +106,43 @@ class SuratTugasController extends Controller
         $dinas_individu = $surat_tugas->where('jenis', 'individu');
         $dinas_tim = $surat_tugas->where('jenis', 'tim');
 
-        return view('surattugas::surattugas.index', compact('dinas_individu', 'dinas_tim'));
+        // Tambahkan logika tambahan jika role adalah wadir2
+        if ($role === 'wadir2') {
+            // Ambil hanya surat tugas individu & tim yang wadir2 jadi pelaksana
+            $dinas_individu = $dinas_individu->filter(function ($surat) use ($pegawai_id) {
+                return $surat->detail->pegawai_id == $pegawai_id;
+            });
+
+            $dinas_tim = $dinas_tim->filter(function ($surat) use ($pegawai_id) {
+                return $surat->detail->pegawai_id == $pegawai_id;
+            });
+        }
+
+        $dinas_semua = $surat_tugas;
+
+        // Tentukan $dinas_data berdasarkan mode
+        $mode = request()->query('mode', 'semua'); // default: 'semua'
+
+        switch ($mode) {
+            case 'individu':
+                $dinas_data = $dinas_individu;
+                break;
+            case 'kelompok':
+                $dinas_data = $dinas_tim;
+                break;
+            case 'semua':
+            default:
+                $dinas_data = $dinas_semua;
+                break;
+        }
+
+        return view('surattugas::surattugas.index', compact(
+            'dinas_individu',
+            'dinas_tim',
+            'dinas_semua',
+            'dinas_data',
+            'mode'
+        ));
     }
 
     /**
@@ -103,10 +165,12 @@ class SuratTugasController extends Controller
     {
         $request->validate([
             'nomor_surat' => 'required|unique:surat_tugas,nomor_surat',
-            'pejabat_id' => 'required|exists:pejabats,id',
             'jenis' => 'required|in:individu,tim',
             'jarak' => 'required|in:dalam_kota,luar_kota', // Added distance field
         ]);
+
+        $getDirektur = Pejabat::where('jabatan_id', 1)->first();
+        $getWadir2 = Pejabat::where('jabatan_id', 3)->first();
 
         DB::beginTransaction();
 
@@ -114,10 +178,12 @@ class SuratTugasController extends Controller
             // Buat surat tugas utama
             $suratTugas = SuratTugas::create([
                 'nomor_surat' => $request->nomor_surat,
-                'pejabat_id' => $request->pejabat_id,
                 'jenis' => $request->jenis,
                 'jarak' => $request->jarak,
-                'access_token' => substr(Str::uuid(), 0, 12),
+                'access_token' => Str::uuid(),
+                'wadir2_id' => optional($getDirektur)->id,
+                'pimpinan_id' => optional($getDirektur)->id,
+                'status' => 'diproses',
             ]);
 
             // Handle range tanggal
@@ -180,12 +246,14 @@ class SuratTugasController extends Controller
 
     /**
      * Show the specified resource.
-     * @param int $id
+     * @param int $access_token
      * @return Renderable
      */
-    public function show($id)
+    public function show($access_token)
     {
-        return view('surattugas::show');
+        $surat = SuratTugas::where('access_token', $access_token)->firstOrFail();
+
+        return view('surattugas::surattugas.show', compact('surat'));
     }
 
     /**
@@ -325,6 +393,58 @@ class SuratTugasController extends Controller
                 ->with('danger', 'Gagal memperbarui surat tugas: ' . $e->getMessage());
         }
     }
+
+    public function approvedBy(Request $request, $access_token)
+    {
+        $user = auth()->user();
+        $suratTugas = SuratTugas::where('access_token', $access_token)->first();
+
+        if (!$suratTugas) {
+            return redirect()->route('surattugas.index')->with('danger', 'Surat tugas tidak ditemukan.');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $pegawai = Pegawai::where('username', $user->username)->first();
+
+            if (!$pegawai) {
+                throw new \Exception('Data pegawai tidak ditemukan.');
+            }
+
+            if ($user->role_aktif === 'wadir2') {
+                // Approval oleh Wadir 2
+                $suratTugas->wadir2_id = $pegawai->id;
+                $suratTugas->tanggal_disetujui_wadir2 = now();
+                $suratTugas->status = 'diproses'; // Masih menunggu persetujuan pimpinan
+                $message = 'Disetujui oleh Wadir 2.';
+            } elseif ($user->role_aktif === 'direktur') {
+                // Direktur hanya bisa menyetujui jika sudah disetujui oleh Wadir 2
+                if (!$suratTugas->tanggal_disetujui_wadir2) {
+                    return redirect()->route('surattugas.index')->with('danger', 'Surat tugas belum disetujui oleh Wadir 2.');
+                }
+
+                // Approval oleh Direktur
+                $suratTugas->pimpinan_id = $pegawai->id;
+                $suratTugas->tanggal_disetujui_pimpinan = now();
+                $suratTugas->status = 'disetujui';
+                $message = 'Disetujui oleh Direktur.';
+            } else {
+                return redirect()->route('surattugas.index')->with('danger', 'Anda tidak memiliki hak untuk menyetujui surat tugas.');
+            }
+
+            $suratTugas->save();
+
+            DB::commit();
+
+            return redirect()->route('surattugas.index')->with('success', 'Surat tugas berhasil disetujui. ' . $message);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->route('surattugas.index')->with('danger', 'Terjadi kesalahan: ' . $th->getMessage());
+        }
+    }
+
+
 
     public function upload(Request $request, $access_token)
     {

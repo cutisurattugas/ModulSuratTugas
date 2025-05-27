@@ -18,6 +18,8 @@ Route::prefix('surattugas')->group(function () {
         Route::get('/', 'SuratTugasController@index')->name('surattugas.index');
         Route::get('/create', 'SuratTugasController@create')->name('surattugas.create');
         Route::post('/store', 'SuratTugasController@store')->name('surattugas.store');
+        Route::get('/show/{access_token}', 'SuratTugasController@show')->name('surattugas.show');
+        Route::put('/approve/{access_token}', 'SuratTugasController@approvedBy')->name('surattugas.approve');
         Route::get('/edit/{access_token}', 'SuratTugasController@edit')->name('surattugas.edit');
         Route::put('/update/{access_token}', 'SuratTugasController@update')->name('surattugas.update');
         Route::post('/laporan/upload/{access_token}', 'SuratTugasController@upload')->name('surattugas.upload');

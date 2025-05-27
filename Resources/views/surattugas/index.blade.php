@@ -2,7 +2,7 @@
 @section('title', 'Surat Tugas')
 
 @section('content_header')
-    <h1 class="m-0 text-dark"></h1>
+    <h1 class="m-0 text-dark">Surat Tugas Perjalanan Dinas</h1>
 @stop
 
 @section('content')
@@ -10,11 +10,11 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h1>Surat Tugas Perjalanan Dinas</h1>
                     <div class="lead">
                         Kelola surat tugas perjalanan dinas.
                         @if (auth()->user()->role_aktif === 'admin')
-                            <a href="{{ route('surattugas.create') }}" class="btn btn-primary btn-sm float-right">Buat Surat</a>
+                            <a href="{{ route('surattugas.create') }}" class="btn btn-primary btn-sm float-right">Buat
+                                Surat</a>
                         @endif
                     </div>
 
@@ -22,32 +22,73 @@
                         @include('layouts.partials.messages')
                     </div>
 
-                    {{-- Tab Header --}}
+                    {{-- Navigasi Tab Dinamis --}}
                     <ul class="nav nav-tabs mb-3" id="dinasLuarTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="individu-tab" data-bs-toggle="tab"
-                                data-bs-target="#individu" type="button" role="tab">Individu</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="kelompok-tab" data-bs-toggle="tab" data-bs-target="#kelompok"
-                                type="button" role="tab">Kelompok</button>
-                        </li>
+
+                        {{-- Tab Individu & Kelompok hanya untuk bukan direktur --}}
+                        @if (!in_array(auth()->user()->role_aktif, ['direktur']))
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="individu-tab" data-bs-toggle="tab"
+                                    data-bs-target="#individu" type="button" role="tab">
+                                    Individu
+                                </button>
+                            </li>
+
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="kelompok-tab" data-bs-toggle="tab" data-bs-target="#kelompok"
+                                    type="button" role="tab">
+                                    Kelompok
+                                </button>
+                            </li>
+                        @endif
+
+                        {{-- Tab Semua Surat Tugas hanya untuk direktur, wadir1, wadir2, wadir3 --}}
+                        @if (in_array(auth()->user()->role_aktif, ['direktur', 'wadir1', 'wadir2', 'wadir3']))
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ auth()->user()->role_aktif === 'direktur' ? 'active' : '' }}"
+                                    id="semua-tab" data-bs-toggle="tab" data-bs-target="#semua" type="button"
+                                    role="tab">
+                                    Semua Surat Tugas
+                                </button>
+                            </li>
+                        @endif
+
                     </ul>
 
-                    {{-- Tab Content --}}
+                    {{-- Konten Tab Dinamis --}}
                     <div class="tab-content" id="dinasLuarTabContent">
-                        <div class="tab-pane fade show active" id="individu" role="tabpanel">
-                            @include('surattugas::surattugas.components.tabel', [
-                                'mode' => 'individu',
-                                'dinas_data' => $dinas_individu,
-                            ])
-                        </div>
-                        <div class="tab-pane fade" id="kelompok" role="tabpanel">
-                            @include('surattugas::surattugas.components.tabel', [
-                                'mode' => 'kelompok',
-                                'dinas_data' => $dinas_tim,
-                            ])
-                        </div>
+
+                        {{-- Tab Individu --}}
+                        @if (!in_array(auth()->user()->role_aktif, ['direktur']))
+                            <div class="tab-pane fade show active" id="individu" role="tabpanel">
+                                @include('surattugas::surattugas.components.tabel', [
+                                    'mode' => 'individu',
+                                    'dinas_data' => $dinas_individu,
+                                ])
+                            </div>
+                        @endif
+
+                        {{-- Tab Kelompok --}}
+                        @if (!in_array(auth()->user()->role_aktif, ['direktur']))
+                            <div class="tab-pane fade" id="kelompok" role="tabpanel">
+                                @include('surattugas::surattugas.components.tabel', [
+                                    'mode' => 'kelompok',
+                                    'dinas_data' => $dinas_tim,
+                                ])
+                            </div>
+                        @endif
+
+                        {{-- Tab Semua Surat Tugas --}}
+                        @if (in_array(auth()->user()->role_aktif, ['direktur', 'wadir1', 'wadir2', 'wadir3']))
+                            <div class="tab-pane fade show {{ auth()->user()->role_aktif === 'direktur' ? 'active' : '' }}"
+                                id="semua" role="tabpanel">
+                                @include('surattugas::surattugas.components.tabel', [
+                                    'mode' => 'semua',
+                                    'dinas_data' => $dinas_semua,
+                                ])
+                            </div>
+                        @endif
+
                     </div>
                 </div>
             </div>

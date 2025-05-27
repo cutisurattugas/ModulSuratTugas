@@ -17,10 +17,15 @@ class CreateSuratTugasTable extends Migration
             $table->id();
             $table->string('access_token');
             $table->string('nomor_surat')->unique();
-            $table->unsignedBigInteger('pejabat_id');
             $table->enum('jenis', ['individu', 'tim']);
             $table->enum('jarak', ['dalam_kota', 'luar_kota']); // Tambahkan ini
-            $table->foreign('pejabat_id')->references('id')->on('pejabats')->onDelete('cascade');
+            $table->enum('status', ['diproses', 'disetujui', 'selesai']);
+            $table->unsignedBigInteger('wadir2_id');
+            $table->timestamp('tanggal_disetujui_wadir2')->nullable();
+            $table->unsignedBigInteger('pimpinan_id');
+            $table->timestamp('tanggal_disetujui_pimpinan')->nullable();
+            $table->foreign('wadir2_id')->references('id')->on('pejabats')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('pimpinan_id')->references('id')->on('pejabats')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

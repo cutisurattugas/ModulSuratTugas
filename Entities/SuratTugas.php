@@ -13,9 +13,13 @@ class SuratTugas extends Model
     protected $fillable = [
         'access_token',
         'nomor_surat',
-        'pejabat_id',
+        'status',
         'jenis',
-        'jarak', // dalam_kota / luar_kota
+        'jarak',
+        'wadir2_id',
+        'tanggal_disetujui_wadir2',
+        'pimpinan_id',
+        'tanggal_disetujui_pimpinan',
     ];
 
     // Relasi ke Pejabat penandatangan

@@ -2,6 +2,9 @@
     <thead>
         <tr>
             <th width="1%">No</th>
+            @if ($mode == 'semua')
+                <th class="text-center">Jenis Surat</th>
+            @endif
             <th class="text-center">Nama Pegawai</th>
             <th class="text-center">Tujuan / Kegiatan</th>
             <th class="text-center">Tanggal</th>
@@ -13,20 +16,27 @@
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
 
+                @if ($mode == 'semua')
+                    <td class="text-center text-uppercase">{{ $item->jenis }}</td>
+                @endif
+
                 {{-- Nama Pegawai --}}
                 <td class="text-center">
                     {{ $item->detail->pegawai->gelar_dpn ?? '' }}{{ $item->detail->pegawai->gelar_dpn ? ' ' : '' }}{{ $item->detail->pegawai->nama }}{{ $item->detail->pegawai->gelar_blk ? ', ' . $item->detail->pegawai->gelar_blk : '' }}
-                    @if ($mode == 'kelompok' && $item->anggota->count())
-                        <br>
-                        <small class="text-muted">
-                            +{{ $item->anggota->count() }} anggota
-                        </small>
+                    @if ($mode == 'kelompok' || ($mode == 'semua' && $item->jenis == 'tim'))
+                        @if ($item->anggota->count())
+                            <br>
+                            <small class="text-muted">
+                                +{{ $item->anggota->count() }} anggota
+                            </small>
+                        @endif
                     @endif
                 </td>
 
                 {{-- Tujuan / Kegiatan --}}
                 <td class="text-center">
-                    <a href="{{route('surattugas.scan', $item->access_token)}}" style="color: black">{{ $item->detail->kegiatan_maksud }}</a>
+                    <a href="{{ route('surattugas.scan', $item->access_token) }}"
+                        style="color: black">{{ $item->detail->kegiatan_maksud }}</a>
                     @if ($item->jarak == 'luar_kota' && $item->detail->alat_angkutan)
                         <br><small class="text-muted">Angkutan: {{ $item->detail->alat_angkutan }}</small>
                     @endif
@@ -36,30 +46,35 @@
                 <td class="text-center">
                     {{ date('d M Y', strtotime($item->detail->tanggal_mulai)) }} -
                     {{ date('d M Y', strtotime($item->detail->tanggal_selesai)) }}
-                    @if ($mode == 'kelompok')
+                    @if ($mode == 'kelompok' || ($mode == 'semua' && $item->jenis == 'tim'))
                         <br><small class="text-muted">({{ $item->detail->lama_perjalanan }} hari)</small>
                     @endif
                 </td>
 
                 {{-- Opsi --}}
                 <td class="text-center">
+                    <!-- Opsi tombol tetap sama seperti sebelumnya -->
                     <a class="btn btn-success btn-sm" href="{{ route('surattugas.print', $item->access_token) }}">
                         <i class="nav-icon fas fa-print"></i>
                     </a>
 
-                    @if ($mode === 'kelompok')
+                    @if ($mode == 'kelompok' || ($mode == 'semua' && $item->jenis == 'tim'))
                         <button class="btn btn-secondary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#modalPelaksana{{ $item->id }}">
                             <i class="fas fa-users"></i>
                         </button>
                     @endif
 
+
                     @php
-                        $rolesCanView = ['admin', 'direktur', 'pegawai', 'dosen', 'keuangan'];
+                        $rolesCanView = ['admin', 'direktur', 'wadir2', 'pegawai', 'dosen', 'keuangan'];
                         $rolesCanUpload = ['pegawai', 'dosen'];
                     @endphp
 
-                    @if (in_array(auth()->user()->role_aktif, $rolesCanView))
+                    @if ()
+                        <a href="{{ route('surattugas.show', $item->access_token) }}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>
+                    @endif
+                    @if (in_array(auth()->user()->role_aktif, ['direktur', 'wadir2']))
                         @if ($item->laporan)
                             <a href="{{ Storage::url($item->laporan->file_laporan) }}" class="btn btn-info btn-sm"
                                 target="_blank">
@@ -73,7 +88,6 @@
                         @endif
                     @endif
 
-
                     @if (auth()->user()->role_aktif === 'admin')
                         <a href="{{ route('surattugas.edit', $item->access_token) }}" class="btn btn-warning btn-sm">
                             <i class="nav-icon fas fa-edit"></i>
@@ -82,8 +96,8 @@
                 </td>
             </tr>
 
-            {{-- Modal Pelaksana (hanya untuk kelompok) --}}
-            @if ($mode === 'kelompok')
+            {{-- Modal Pelaksana (hanya untuk kelompok / tim) --}}
+            @if ($mode == 'kelompok' || ($mode == 'semua' && $item->jenis == 'tim'))
                 <div class="modal fade" id="modalPelaksana{{ $item->id }}" tabindex="-1"
                     aria-labelledby="modalLabel{{ $item->id }}" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
@@ -150,7 +164,8 @@
             </div>
         @empty
             <tr>
-                <td colspan="5" class="text-center text-muted">Belum ada data surat tugas {{ $mode }}</td>
+                <td colspan="{{ $mode == 'semua' ? 6 : 5 }}" class="text-center text-muted">Belum ada data surat tugas
+                    {{ $mode }}</td>
             </tr>
         @endforelse
     </tbody>

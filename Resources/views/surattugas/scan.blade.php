@@ -85,6 +85,12 @@
                         <p><strong>Dibuat</strong><br>
                             {{ $perjalanan->created_at ? date('d M Y: H:i:s', strtotime($perjalanan->created_at)) : '-' }}
                         </p>
+                        <p><strong>Tanggal Disetujui Wadir 2:</strong><br>
+                            {{ date('d M Y: H:i:s', strtotime($perjalanan->tanggal_disetujui_wadir2 ?? '-'))}}
+                        </p>
+                        <p><strong>Tanggal Disetujui Direktur:</strong><br>
+                            {{ date('d M Y: H:i:s', strtotime($perjalanan->tanggal_disetujui_pimpinan ?? '-'))}}
+                        </p>
                     </div>
                 </div>
             </div>

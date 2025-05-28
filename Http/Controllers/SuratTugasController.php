@@ -54,7 +54,7 @@ class SuratTugasController extends Controller
             // - DAN tambahan surat yang dia terlibat (individu/tim)
 
             // Ambil semua surat (seperti direktur)
-            $semua_surat = $query->get();
+            $semua_surat = $query->latest()->get();
 
             // Ambil surat yang terlibat sebagai pelaksana (individu/tim)
             $milik_sendiri = SuratTugas::with([
@@ -412,9 +412,16 @@ class SuratTugasController extends Controller
                 throw new \Exception('Data pegawai tidak ditemukan.');
             }
 
+            // Cari ID pejabat berdasarkan pegawai_id
+            $pejabat = Pejabat::where('pegawai_id', $pegawai->id)->first();
+
+            if (!$pejabat) {
+                throw new \Exception('Data pejabat tidak ditemukan untuk pegawai ini.');
+            }
+
             if ($user->role_aktif === 'wadir2') {
                 // Approval oleh Wadir 2
-                $suratTugas->wadir2_id = $pegawai->id;
+                $suratTugas->wadir2_id = $pejabat->id;
                 $suratTugas->tanggal_disetujui_wadir2 = now();
                 $suratTugas->status = 'diproses'; // Masih menunggu persetujuan pimpinan
                 $message = 'Disetujui oleh Wadir 2.';
@@ -425,7 +432,7 @@ class SuratTugasController extends Controller
                 }
 
                 // Approval oleh Direktur
-                $suratTugas->pimpinan_id = $pegawai->id;
+                $suratTugas->pimpinan_id = $pejabat->id;
                 $suratTugas->tanggal_disetujui_pimpinan = now();
                 $suratTugas->status = 'disetujui';
                 $message = 'Disetujui oleh Direktur.';
@@ -444,21 +451,42 @@ class SuratTugasController extends Controller
         }
     }
 
-
-
     public function upload(Request $request, $access_token)
     {
-        $request->validate(['file_laporan' => 'required|mimes:pdf|max:10240']);
+        // Validasi file laporan
+        $request->validate([
+            'file_laporan' => 'required|mimes:pdf|max:10240'
+        ]);
 
-        $suratTugas = SuratTugas::where('access_token', $access_token)->firstOrFail();
-        $path = $request->file('file_laporan')->store('laporan', 'public');
+        DB::beginTransaction();
 
-        LaporanSuratTugas::updateOrCreate(
-            ['surat_tugas_id' => $suratTugas->id],
-            ['file_laporan' => $path, 'tanggal_upload' => now()]
-        );
+        try {
+            // Ambil surat tugas berdasarkan access token
+            $suratTugas = SuratTugas::where('access_token', $access_token)->firstOrFail();
 
-        return back()->with('success', 'Laporan berhasil diunggah!');
+            // Update status surat tugas
+            $suratTugas->status = 'diproses';
+            $suratTugas->save();
+
+            // Simpan file ke storage
+            $path = $request->file('file_laporan')->store('laporan', 'public');
+
+            // Update atau buat laporan surat tugas
+            LaporanSuratTugas::updateOrCreate(
+                ['surat_tugas_id' => $suratTugas->id],
+                [
+                    'file_laporan' => $path,
+                    'tanggal_upload' => now()
+                ]
+            );
+
+            DB::commit();
+
+            return back()->with('success', 'Laporan berhasil diunggah!');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('danger', 'Terjadi kesalahan saat mengunggah laporan: ' . $e->getMessage());
+        }
     }
 
     /**

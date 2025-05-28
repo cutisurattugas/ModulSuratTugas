@@ -512,7 +512,22 @@
                     Pada Tanggal: <strong>{{date('d M Y', strtotime($perjalanan->created_at))}}</strong><br><br>
                     Pejabat Pembuat Komitmen,
                 </p>
-                <div class="signature-space" style="height: 40px;"></div>
+                <div class="signature-space" style="height: 40px;">
+                    <div class="digital-stamp">
+                    <div class="stamp-logo">
+                        <img src="{{ asset('assets/img/logo.png') }}" alt="Logo Instansi">
+                    </div>
+                    <div class="stamp-text">
+                        Ditandatangani secara elektronik oleh<br>
+                        Direktur Politeknik Negeri Banyuwangi<br>
+                        selaku Pejabat yang Berwenang
+                    </div>
+                    <div>
+                        <img src="data:image/svg+xml;base64,{{ base64_encode($qrCodeImage) }}" alt="QR Code"
+                            style="width: 28px; height: 28px;" />
+                    </div>
+                </div>
+                </div>
                 <p>
                     <strong>{{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}</strong><br>
                     NIP {{$perjalanan->pejabat->pegawai->nip}}

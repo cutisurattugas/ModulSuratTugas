@@ -96,6 +96,7 @@
             text-align: center;
             margin-bottom: 20px;
         }
+
         .btn-print {
             display: inline-block;
             padding: 5px 10px;
@@ -498,9 +499,24 @@
             <div class="signature-footer">
                 <p style="margin: 3px 0;">Mengetahui,</p>
                 <p style="margin: 3px 0;">Pejabat Pembuat Komitmen,</p>
-                <br><br>
-                <p class="signature-name"> {{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}</p>
-                <p style="margin: 3px 0;">NIP {{$perjalanan->pejabat->pegawai->nip}}</p>
+                <div class="digital-stamp">
+                    <div class="stamp-logo">
+                        <img src="{{ asset('assets/img/logo.png') }}" alt="Logo Instansi">
+                    </div>
+                    <div class="stamp-text">
+                        Ditandatangani secara elektronik oleh<br>
+                        Direktur Politeknik Negeri Banyuwangi<br>
+                        selaku Pejabat yang Berwenang
+                    </div>
+                    <div>
+                        <img src="data:image/svg+xml;base64,{{ base64_encode($qrCodeImage) }}" alt="QR Code"
+                            style="width: 28px; height: 28px;" />
+                    </div>
+                </div>
+                <p class="signature-name">
+                    {{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}
+                </p>
+                <p style="margin: 3px 0;">NIP {{ $perjalanan->pejabat->pegawai->nip }}</p>
             </div> <!-- Tutup .signature-footer -->
 
         </div> <!-- Tutup .main-content -->

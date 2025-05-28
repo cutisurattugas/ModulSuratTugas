@@ -25,7 +25,12 @@ class SuratTugas extends Model
     // Relasi ke Pejabat penandatangan
     public function pejabat()
     {
-        return $this->belongsTo(Pejabat::class);
+        return $this->belongsTo(Pejabat::class, 'wadir2_id');
+    }
+
+    public function pimpinan()
+    {
+        return $this->belongsTo(Pejabat::class, 'pimpinan_id');
     }
 
     // Relasi ke DetailSuratTugas (untuk data individu/tim)

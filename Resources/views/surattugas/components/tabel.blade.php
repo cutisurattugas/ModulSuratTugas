@@ -54,33 +54,34 @@
                 {{-- Opsi --}}
                 <td class="text-center">
                     <!-- Opsi tombol tetap sama seperti sebelumnya -->
-                    <a class="btn btn-success btn-sm" href="{{ route('surattugas.print', $item->access_token) }}">
-                        <i class="nav-icon fas fa-print"></i>
-                    </a>
-
-                    @if ($mode == 'kelompok' || ($mode == 'semua' && $item->jenis == 'tim'))
-                        <button class="btn btn-secondary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#modalPelaksana{{ $item->id }}">
-                            <i class="fas fa-users"></i>
-                        </button>
+                    @if ($item->tanggal_disetujui_wadir2 && $item->tanggal_disetujui_pimpinan)
+                        <a class="btn btn-success btn-sm" href="{{ route('surattugas.print', $item->access_token) }}">
+                            <i class="nav-icon fas fa-print"></i>
+                        </a>
                     @endif
-
 
                     @php
-                        $rolesCanView = ['admin', 'direktur', 'wadir2', 'pegawai', 'dosen', 'keuangan'];
                         $rolesCanUpload = ['pegawai', 'dosen'];
+                        $rolesCanViewLaporan = ['pegawai', 'dosen', 'wadir2', 'direktur'];
                     @endphp
 
-                    @if ()
-                        <a href="{{ route('surattugas.show', $item->access_token) }}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>
-                    @endif
+                    {{-- Tombol Lihat Surat Tugas --}}
                     @if (in_array(auth()->user()->role_aktif, ['direktur', 'wadir2']))
-                        @if ($item->laporan)
+                        <a href="{{ route('surattugas.show', $item->access_token) }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    @endif
+
+                    {{-- Tombol Lihat atau Upload Laporan --}}
+                    @if ($item->laporan)
+                        @if (in_array(auth()->user()->role_aktif, $rolesCanViewLaporan))
                             <a href="{{ Storage::url($item->laporan->file_laporan) }}" class="btn btn-info btn-sm"
                                 target="_blank">
                                 <i class="nav-icon fas fa-file-pdf"></i> Laporan
                             </a>
-                        @elseif (in_array(auth()->user()->role_aktif, $rolesCanUpload))
+                        @endif
+                    @else
+                        @if (in_array(auth()->user()->role_aktif, $rolesCanUpload))
                             <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#modalUploadLaporan{{ $item->access_token }}">
                                 <i class="nav-icon fas fa-arrow-circle-up"></i>
@@ -95,41 +96,6 @@
                     @endif
                 </td>
             </tr>
-
-            {{-- Modal Pelaksana (hanya untuk kelompok / tim) --}}
-            @if ($mode == 'kelompok' || ($mode == 'semua' && $item->jenis == 'tim'))
-                <div class="modal fade" id="modalPelaksana{{ $item->id }}" tabindex="-1"
-                    aria-labelledby="modalLabel{{ $item->id }}" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="modalLabel{{ $item->id }}">Daftar Pelaksana</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Tutup"></button>
-                            </div>
-                            <div class="modal-body">
-                                <strong>Ketua Tim:</strong>
-                                <p>
-                                    {{ $item->detail->pegawai->gelar_dpn ?? '' }}{{ $item->detail->pegawai->gelar_dpn ? ' ' : '' }}{{ $item->detail->pegawai->nama }}{{ $item->detail->pegawai->gelar_blk ? ', ' . $item->detail->pegawai->gelar_blk : '' }}
-                                </p>
-
-                                <strong>Anggota Tim:</strong>
-                                @if ($item->anggota->isEmpty())
-                                    <p class="text-muted">Tidak ada anggota.</p>
-                                @else
-                                    <ul>
-                                        @foreach ($item->anggota as $anggota)
-                                            <li>
-                                                {{ $anggota->pegawai->gelar_dpn ?? '' }}{{ $anggota->pegawai->gelar_dpn ? ' ' : '' }}{{ $anggota->pegawai->nama }}{{ $anggota->pegawai->gelar_blk ? ', ' . $anggota->pegawai->gelar_blk : '' }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
 
             <!-- Modal Upload Laporan -->
             <div class="modal fade" id="modalUploadLaporan{{ $item->access_token }}" tabindex="-1"

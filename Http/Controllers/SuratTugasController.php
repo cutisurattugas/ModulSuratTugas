@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Pengaturan\Entities\Pejabat;
 use Modules\SuratTugas\Entities\AnggotaSuratTugas;
@@ -455,23 +456,30 @@ class SuratTugasController extends Controller
     {
         // Validasi file laporan
         $request->validate([
-            'file_laporan' => 'required|mimes:pdf|max:10240'
+            'file_laporan' => 'required|mimes:pdf,docx|max:10240' // tambahkan docx jika perlu
         ]);
 
         DB::beginTransaction();
 
         try {
-            // Ambil surat tugas berdasarkan access token
             $suratTugas = SuratTugas::where('access_token', $access_token)->firstOrFail();
 
-            // Update status surat tugas
+            // Update status jika perlu
             $suratTugas->status = 'diproses';
             $suratTugas->save();
 
-            // Simpan file ke storage
+            // Cek apakah laporan sebelumnya sudah ada
+            $existingLaporan = $suratTugas->laporan;
+
+            // Hapus file lama jika ada
+            if ($existingLaporan && Storage::disk('public')->exists($existingLaporan->file_laporan)) {
+                Storage::disk('public')->delete($existingLaporan->file_laporan);
+            }
+
+            // Simpan file baru
             $path = $request->file('file_laporan')->store('laporan', 'public');
 
-            // Update atau buat laporan surat tugas
+            // Update atau buat laporan baru
             LaporanSuratTugas::updateOrCreate(
                 ['surat_tugas_id' => $suratTugas->id],
                 [
@@ -482,12 +490,13 @@ class SuratTugasController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'Laporan berhasil diunggah!');
+            return back()->with('success', 'Laporan berhasil diunggah (diperbarui)!');
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->with('danger', 'Terjadi kesalahan saat mengunggah laporan: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Remove the specified resource from storage.

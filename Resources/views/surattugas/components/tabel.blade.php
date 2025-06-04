@@ -73,20 +73,18 @@
                     @endif
 
                     {{-- Tombol Lihat atau Upload Laporan --}}
-                    @if ($item->laporan)
-                        @if (in_array(auth()->user()->role_aktif, $rolesCanViewLaporan))
-                            <a href="{{ Storage::url($item->laporan->file_laporan) }}" class="btn btn-info btn-sm"
-                                target="_blank">
-                                <i class="nav-icon fas fa-file-pdf"></i> Laporan
-                            </a>
-                        @endif
-                    @else
-                        @if (in_array(auth()->user()->role_aktif, $rolesCanUpload))
-                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#modalUploadLaporan{{ $item->access_token }}">
-                                <i class="nav-icon fas fa-arrow-circle-up"></i>
-                            </button>
-                        @endif
+                    @if (in_array(auth()->user()->role_aktif, $rolesCanUpload))
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalUploadLaporan{{ $item->access_token }}">
+                            <i class="nav-icon fas fa-arrow-circle-up"></i>
+                        </button>
+                    @endif
+
+                    @if ($item->laporan && in_array(auth()->user()->role_aktif, $rolesCanViewLaporan))
+                        <a href="{{ Storage::url($item->laporan->file_laporan) }}" class="btn btn-info btn-sm"
+                            target="_blank">
+                            <i class="nav-icon fas fa-file-pdf"></i> Laporan
+                        </a>
                     @endif
 
                     @if (auth()->user()->role_aktif === 'admin')
@@ -116,8 +114,8 @@
                                     <label for="file_laporan{{ $item->access_token }}" class="form-label">Pilih File
                                         Laporan</label>
                                     <input type="file" name="file_laporan" class="form-control"
-                                        id="file_laporan{{ $item->access_token }}" required>
-                                    <small class="text-muted">Format: PDF, DOCX | Max: 10MB</small>
+                                        id="file_laporan{{ $item->access_token }}" accept=".pdf" required>
+                                    <small class="text-muted">Format: PDF | Max: 10MB</small>
                                 </div>
                             </div>
                             <div class="modal-footer">

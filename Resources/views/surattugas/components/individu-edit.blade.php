@@ -47,8 +47,7 @@
     </div>
     <div class="col-md-6">
         <label for="tempat">Tempat Kegiatan</label>
-        <input type="text" name="tempat" class="form-control"
-            value="{{ $suratTugas->detail->tempat }}" required>
+        <input type="text" name="tempat" class="form-control" value="{{ $suratTugas->detail->tempat }}" required>
     </div>
 </div>
 
@@ -56,34 +55,40 @@
     <div class="col-md-6">
         <label for="tanggal">Tanggal</label>
         <input type="text" name="tanggal" class="form-control flatpickr"
-            value="{{ $suratTugas->detail->tanggal_mulai }} to {{ $suratTugas->detail->tanggal_selesai }}"
-            required>
+            value="{{ $suratTugas->detail->tanggal_mulai }} to {{ $suratTugas->detail->tanggal_selesai }}" required>
     </div>
-    <div class="col-md-6" id="alat_angkutan_container" style="{{ $suratTugas->jarak == 'luar_kota' ? 'display: block;' : 'display: none;' }}">
+    <div class="col-md-6" id="alat_angkutan_container"
+        style="{{ $suratTugas->jarak == 'luar_kota' ? 'display: block;' : 'display: none;' }}">
         <label for="alat_angkutan">Alat Angkutan</label>
-        <select class="form-control" name="alat_angkutan" id="alat_angkutan">
+        <select name="alat_angkutan" id="alat_angkutan_individu">
             <option value="">-- Pilih Angkutan --</option>
+            <option value="{{ $suratTugas->detail->alat_angkutan }}" selected>
+                {{ $suratTugas->detail->alat_angkutan }}
+            </option>
             <option value="Bis" {{ $suratTugas->detail->alat_angkutan == 'Bis' ? 'selected' : '' }}>Bis</option>
-            <option value="Kereta" {{ $suratTugas->detail->alat_angkutan == 'Kereta' ? 'selected' : '' }}>Kereta</option>
-            <option value="Pesawat" {{ $suratTugas->detail->alat_angkutan == 'Pesawat' ? 'selected' : '' }}>Pesawat</option>
+            <option value="Kereta" {{ $suratTugas->detail->alat_angkutan == 'Kereta' ? 'selected' : '' }}>Kereta
+            </option>
+            <option value="Pesawat" {{ $suratTugas->detail->alat_angkutan == 'Pesawat' ? 'selected' : '' }}>Pesawat
+            </option>
         </select>
     </div>
 </div>
 
-<div class="form-group row" id="kota_fields_individu" style="{{ $suratTugas->jarak == 'luar_kota' ? 'display: flex;' : 'display: none;' }}">
+<div class="form-group row" id="kota_fields_individu"
+    style="{{ $suratTugas->jarak == 'luar_kota' ? 'display: flex;' : 'display: none;' }}">
     <!-- Kota Keberangkatan -->
     <div class="col-md-6">
         <label for="kota_keberangkatan">Kota Keberangkatan</label>
         <input type="text" name="kota_keberangkatan" class="form-control"
-               value="{{ old('kota_keberangkatan', optional($suratTugas->detail)->kota_keberangkatan) }}"
-               placeholder="Contoh: Surabaya">
+            value="{{ old('kota_keberangkatan', optional($suratTugas->detail)->kota_keberangkatan) }}"
+            placeholder="Contoh: Surabaya">
     </div>
 
     <!-- Kota Tujuan -->
     <div class="col-md-6">
         <label for="kota_tujuan">Kota Tujuan</label>
         <input type="text" name="kota_tujuan" class="form-control"
-               value="{{ old('kota_tujuan', optional($suratTugas->detail)->kota_tujuan) }}"
-               placeholder="Contoh: Banyuwangi">
+            value="{{ old('kota_tujuan', optional($suratTugas->detail)->kota_tujuan) }}"
+            placeholder="Contoh: Banyuwangi">
     </div>
 </div>

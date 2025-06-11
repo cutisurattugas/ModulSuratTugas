@@ -72,6 +72,23 @@
                         direction: "asc"
                     }
                 });
+                new TomSelect("#alat_angkutan_individu", {
+                    create: true,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    },
+                    placeholder: "-- Pilih atau ketik angkutan --"
+                });
+                new TomSelect("#alat_angkutan_tim", {
+                    create: true,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    },
+                    placeholder: "-- Pilih atau ketik angkutan --"
+                });
+
             });
         });
     </script>

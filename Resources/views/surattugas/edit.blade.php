@@ -45,7 +45,7 @@
 @section('adminlte_js')
     {{-- bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     {{-- flat pickr --}}
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
@@ -69,6 +69,25 @@
                         direction: "asc"
                     }
                 });
+                // new TomSelect("#alat_angkutan_individu", {
+                //     create: true,
+                //     persist: true,
+                //     placeholder: "-- Pilih atau ketik angkutan --",
+                //     sortField: {
+                //         field: "text",
+                //         direction: "asc"
+                //     }
+                // });
+                // new TomSelect("#alat_angkutan_tim", {
+                //     create: true,
+                //     persist: true,
+                //     placeholder: "-- Pilih atau ketik angkutan --",
+                //     sortField: {
+                //         field: "text",
+                //         direction: "asc"
+                //     }
+                // });
+
             });
 
             // Show/hide alat angkutan based on jarak selection
@@ -102,7 +121,8 @@
                         // Reset value jika dalam_kota
                         if (!isLuarKota) {
                             const alatAngkutan = alatAngkutanContainer.querySelector('select');
-                            const kotaKeberangkatan = kotaFields.querySelector('input[name="kota_keberangkatan"]');
+                            const kotaKeberangkatan = kotaFields.querySelector(
+                                'input[name="kota_keberangkatan"]');
                             const kotaTujuan = kotaFields.querySelector('input[name="kota_tujuan"]');
 
                             if (alatAngkutan) alatAngkutan.value = '';

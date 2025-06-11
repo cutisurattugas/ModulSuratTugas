@@ -63,7 +63,7 @@
         </div>
         <div class="col-md-6" id="alat_angkutan_container_individu" style="display: none;">
             <label for="alat_angkutan">Alat Angkutan</label>
-            <select class="form-control" name="alat_angkutan" id="alat_angkutan_individu">
+            <select name="alat_angkutan" id="alat_angkutan_individu">
                 <option value="">-- Pilih Angkutan --</option>
                 <option value="Bis">Bis</option>
                 <option value="Kereta">Kereta</option>

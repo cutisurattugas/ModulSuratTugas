@@ -61,6 +61,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize TomSelect for all select elements
+            // Inisialisasi untuk select umum
             document.querySelectorAll('.tomselect-edit').forEach(function(element) {
                 new TomSelect(element, {
                     create: false,
@@ -69,35 +70,42 @@
                         direction: "asc"
                     }
                 });
-                // new TomSelect("#alat_angkutan_individu", {
-                //     create: true,
-                //     persist: true,
-                //     placeholder: "-- Pilih atau ketik angkutan --",
-                //     sortField: {
-                //         field: "text",
-                //         direction: "asc"
-                //     }
-                // });
-                // new TomSelect("#alat_angkutan_tim", {
-                //     create: true,
-                //     persist: true,
-                //     placeholder: "-- Pilih atau ketik angkutan --",
-                //     sortField: {
-                //         field: "text",
-                //         direction: "asc"
-                //     }
-                // });
-
             });
+
+            // Inisialisasi alat angkutan individu
+            if (document.querySelector("#alat_angkutan_individu")) {
+                new TomSelect("#alat_angkutan_individu", {
+                    create: true,
+                    persist: true,
+                    placeholder: "-- Pilih atau ketik angkutan --",
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    }
+                });
+            }
+
+            // Inisialisasi alat angkutan tim
+            if (document.querySelector("#alat_angkutan_tim")) {
+                new TomSelect("#alat_angkutan_tim", {
+                    create: true,
+                    persist: true,
+                    placeholder: "-- Pilih atau ketik angkutan --",
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    }
+                });
+            }
 
             // Show/hide alat angkutan based on jarak selection
             const forms = [{
                 jarakId: 'jarak_individu',
-                alatContainerId: 'alat_angkutan_container',
+                alatContainerId: 'alat_angkutan_container_individu',
                 kotaFieldsId: 'kota_fields_individu'
             }, {
                 jarakId: 'jarak_kelompok',
-                alatContainerId: 'alat_angkutan_container',
+                alatContainerId: 'alat_angkutan_container_tim',
                 kotaFieldsId: 'kota_fields_kelompok'
             }];
 

@@ -20,7 +20,7 @@
 <div class="form-group row">
     <div class="col-md-6">
         <label for="jarak">Jenis Perjalanan</label>
-        <select name="jarak" class="form-control" required>
+        <select name="jarak" id="jarak_kelompok" class="form-control" required>
             <option value="dalam_kota" {{ $suratTugas->jarak == 'dalam_kota' ? 'selected' : '' }}>Dalam Kota</option>
             <option value="luar_kota" {{ $suratTugas->jarak == 'luar_kota' ? 'selected' : '' }}>Luar Kota</option>
         </select>
@@ -57,14 +57,11 @@
         <input type="text" name="tanggal" class="form-control flatpickr"
             value="{{ $suratTugas->detail->tanggal_mulai }} to {{ $suratTugas->detail->tanggal_selesai }}" required>
     </div>
-    <div class="col-md-6" id="alat_angkutan_container"
-        style="{{ $suratTugas->jarak == 'luar_kota' ? 'display: block;' : 'display: none;' }}">
+    <div class="col-md-6" id="alat_angkutan_container_tim"
+        style="{{ $suratTugas->jarak == 'luar_kota' ? '' : 'display: none;' }}">
         <label for="alat_angkutan">Alat Angkutan</label>
         <select name="alat_angkutan" id="alat_angkutan_tim">
             <option value="">-- Pilih Angkutan --</option>
-            <option value="{{ $suratTugas->detail->alat_angkutan }}" selected>
-                {{ $suratTugas->detail->alat_angkutan }}
-            </option>
             <option value="Bis" {{ $suratTugas->detail->alat_angkutan == 'Bis' ? 'selected' : '' }}>Bis</option>
             <option value="Kereta" {{ $suratTugas->detail->alat_angkutan == 'Kereta' ? 'selected' : '' }}>Kereta
             </option>
@@ -94,9 +91,10 @@
         </select>
     </div>
 </div>
+
 <!-- Kota Keberangkatan & Tujuan -->
 <div class="form-group row" id="kota_fields_kelompok"
-    style="{{ $suratTugas->jarak === 'luar_kota' ? 'display: flex;' : 'display: none;' }}">
+    style="{{ $suratTugas->jarak == 'luar_kota' ? '' : 'display: none;' }}">
     <div class="col-md-6">
         <label for="kota_keberangkatan">Kota Keberangkatan</label>
         <input type="text" name="kota_keberangkatan" class="form-control"

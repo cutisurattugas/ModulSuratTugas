@@ -63,34 +63,42 @@
     {{-- Tom Select --}}
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.tomselect').forEach(function(element) {
-                new TomSelect(element, {
-                    create: false,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    }
-                });
-                new TomSelect("#alat_angkutan_individu", {
-                    create: true,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    placeholder: "-- Pilih atau ketik angkutan --"
-                });
-                new TomSelect("#alat_angkutan_tim", {
-                    create: true,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    placeholder: "-- Pilih atau ketik angkutan --"
-                });
-
+        document.addEventListener('DOMContentLoaded', function () {
+    // Inisialisasi umum untuk semua .tomselect
+    document.querySelectorAll('.tomselect').forEach(function (element) {
+        // Hindari inisialisasi ulang elemen yang sudah dihandle secara khusus
+        if (
+            element.id !== 'alat_angkutan_individu' &&
+            element.id !== 'alat_angkutan_tim'
+        ) {
+            new TomSelect(element, {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                }
             });
-        });
+        }
+    });
+
+    // Inisialisasi khusus untuk alat angkutan
+    const angkutanOptions = {
+        create: true,
+        sortField: {
+            field: "text",
+            direction: "asc"
+        },
+        placeholder: "-- Pilih atau ketik angkutan --"
+    };
+
+    if (document.getElementById("alat_angkutan_individu")) {
+        new TomSelect("#alat_angkutan_individu", angkutanOptions);
+    }
+    if (document.getElementById("alat_angkutan_tim")) {
+        new TomSelect("#alat_angkutan_tim", angkutanOptions);
+    }
+});
+
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

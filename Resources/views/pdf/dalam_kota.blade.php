@@ -1,3 +1,28 @@
+<?php
+$bulanInggris = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+$bulanIndonesia = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+?>
+
+<?php
+function tanggalIndo($tanggal)
+{
+    $bulanInggris = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    $bulanIndonesia = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    // Format tanggal asli: Y-m-d (sesuaikan jika format berbeda)
+    $tanggalParts = explode('-', $tanggal);
+    $bulanAngka = (int) $tanggalParts[1];
+
+    // Jika tanggal sudah dalam format timestamp (strtotime)
+    if (is_numeric($tanggal)) {
+        $formatInggris = date('d M Y', $tanggal);
+    } else {
+        $formatInggris = date('d M Y', strtotime($tanggal));
+    }
+
+    return str_replace($bulanInggris, $bulanIndonesia, $formatInggris);
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -392,8 +417,8 @@
             </tr>
             <tr>
                 <td>Waktu</td>
-                <td>: {{ date('d M Y', strtotime($perjalanan->detail->tanggal_mulai)) }} -
-                    {{ date('d M Y', strtotime($perjalanan->detail->tanggal_selesai)) }}</td>
+                <td>: {{ tanggalIndo($perjalanan->detail->tanggal_mulai) }}-
+                    {{ tanggalIndo($perjalanan->detail->tanggal_selesai) }}</td>
             </tr>
             <tr>
                 <td>Tempat</td>
@@ -415,7 +440,7 @@
                 <div class="signatures">
                     <div class="ttd">
                         <div class="sign" style="margin-bottom: 0;">
-                            Banyuwangi, {{ date('d M Y', strtotime($perjalanan->created_at)) }}<br>
+                            Banyuwangi, {{ tanggalIndo($perjalanan->created_at) }}<br>
                             {{ $direktur->jabatan->jabatan }},<br>
                             <div class="digital-stamp">
                                 <div class="stamp-logo">

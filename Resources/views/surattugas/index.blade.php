@@ -16,6 +16,9 @@
                             <a href="{{ route('surattugas.create') }}" class="btn btn-primary btn-sm float-right">Buat
                                 Surat</a>
                         @endif
+                        @if (in_array(auth()->user()->role_aktif, ['dosen', 'pegawai', 'wadir1', 'wadir2', 'wadir3', 'kaunit']))
+                            <a href="#" class="btn btn-primary btn-sm float-right">Unduh Format Laporan</a>
+                        @endif
                     </div>
 
                     <div class="mt-2">

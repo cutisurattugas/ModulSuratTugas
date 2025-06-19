@@ -1,3 +1,28 @@
+<?php
+$bulanInggris = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+$bulanIndonesia = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+?>
+
+<?php
+function tanggalIndo($tanggal)
+{
+    $bulanInggris = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    $bulanIndonesia = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    // Format tanggal asli: Y-m-d (sesuaikan jika format berbeda)
+    $tanggalParts = explode('-', $tanggal);
+    $bulanAngka = (int) $tanggalParts[1];
+
+    // Jika tanggal sudah dalam format timestamp (strtotime)
+    if (is_numeric($tanggal)) {
+        $formatInggris = date('d M Y', $tanggal);
+    } else {
+        $formatInggris = date('d M Y', strtotime($tanggal));
+    }
+
+    return str_replace($bulanInggris, $bulanIndonesia, $formatInggris);
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -351,8 +376,8 @@
             </tr>
             <tr>
                 <td>Waktu</td>
-                <td>: {{ date('d M Y', strtotime($perjalanan->detail->tanggal_mulai)) }} -
-                    {{ date('d M Y', strtotime($perjalanan->detail->tanggal_selesai)) }}</td>
+                <td>: {{ tanggalIndo($perjalanan->detail->tanggal_mulai) }}-
+                    {{ tanggalIndo($perjalanan->detail->tanggal_selesai) }}</td>
             </tr>
             <tr>
                 <td>Tempat</td>
@@ -373,7 +398,7 @@
             <div class="signatures">
                 <div class="ttd">
                     <div class="sign">
-                        Banyuwangi, {{ date('d M Y', strtotime($perjalanan->created_at)) }}<br>
+                        Banyuwangi, {{ tanggalIndo($perjalanan->created_at) }}<br>
                         {{ $direktur->jabatan->jabatan }},<br>
                         <div class="digital-stamp">
                             <div class="stamp-logo">
@@ -424,39 +449,44 @@
             <tr>
                 <td width="5%">1.</td>
                 <td>Pejabat Pembuat Komitmen</td>
-                <td colspan="2">{{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}</td>
+                <td colspan="2">
+                    {{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}
+                </td>
             </tr>
             <tr>
                 <td>2.</td>
                 <td>Nama/NIP Pegawai yang melaksanakan perjalanan dinas</td>
-                <td colspan="2"> {{ $perjalanan->detail->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->detail->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->detail->pegawai->nama }}{{ $perjalanan->detail->pegawai->gelar_blk ? ', ' . $perjalanan->detail->pegawai->gelar_blk : '' }} <br>{{ $perjalanan->detail->pegawai->nip }}</td>
+                <td colspan="2">
+                    {{ $perjalanan->detail->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->detail->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->detail->pegawai->nama }}{{ $perjalanan->detail->pegawai->gelar_blk ? ', ' . $perjalanan->detail->pegawai->gelar_blk : '' }}
+                    <br>{{ $perjalanan->detail->pegawai->nip }}</td>
             </tr>
             <tr>
                 <td>3.</td>
                 <td> a. Pangkat dan Gol <br>
-                     b. Jabatan/Instansi <br>
-                     c. Tingkat Biaya Perjalanan Dinas
+                    b. Jabatan/Instansi <br>
+                    c. Tingkat Biaya Perjalanan Dinas
                 </td>
                 <td colspan="2">
                     a. <br>
                     b. Politeknik Negeri Banyuwangi <br>
-                    c. 
+                    c.
                 </td>
             </tr>
             <tr>
                 <td>4.</td>
                 <td>Maksud Perjalanan Dinas</td>
-                <td colspan="2">{{$perjalanan->detail->kegiatan_maksud}}</td>
+                <td colspan="2">{{ $perjalanan->detail->kegiatan_maksud }}</td>
             </tr>
             <tr>
                 <td>5.</td>
                 <td>Alat Angkutan</td>
-                <td colspan="2">{{$perjalanan->detail->alat_angkutan}}</td>
+                <td colspan="2">{{ $perjalanan->detail->alat_angkutan }}</td>
             </tr>
             <tr>
                 <td>6.</td>
                 <td>a. Tempat Berangkat<br>b. Tempat Tujuan</td>
-                <td colspan="2">a. {{$perjalanan->detail->kota_keberangkatan}}<br>b. {{$perjalanan->detail->kota_tujuan}}</td>
+                <td colspan="2">a. {{ $perjalanan->detail->kota_keberangkatan }}<br>b.
+                    {{ $perjalanan->detail->kota_tujuan }}</td>
             </tr>
             <tr>
                 <td>7.</td>
@@ -466,9 +496,9 @@
                     c. Tanggal Harus Kembali
                 </td>
                 <td colspan="2">
-                    a. {{$perjalanan->detail->lama_perjalanan}}<br>
-                    b. {{ date('d M Y', strtotime($perjalanan->detail->tanggal_mulai)) }}<br>
-                    c. {{ date('d M Y', strtotime($perjalanan->detail->tanggal_selesai)) }}
+                    a. {{ $perjalanan->detail->lama_perjalanan }}<br>
+                    b. {{ tanggalIndo($perjalanan->detail->tanggal_mulai) }}<br>
+                    c. {{ tanggalIndo($perjalanan->detail->tanggal_selesai) }}
                 </td>
             </tr>
             <tr>
@@ -509,28 +539,28 @@
             <div style="display: inline-block; text-align: left;">
                 <p>
                     Dikeluarkan di: <strong>Banyuwangi</strong><br>
-                    Pada Tanggal: <strong>{{date('d M Y', strtotime($perjalanan->created_at))}}</strong><br><br>
+                    Pada Tanggal: <strong>{{ tanggalIndo($perjalanan->created_at) }}</strong><br><br>
                     Pejabat Pembuat Komitmen,
                 </p>
                 <div class="signature-space" style="height: 40px;">
                     <div class="digital-stamp">
-                    <div class="stamp-logo">
-                        <img src="{{ asset('assets/img/logo.png') }}" alt="Logo Instansi">
+                        <div class="stamp-logo">
+                            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo Instansi">
+                        </div>
+                        <div class="stamp-text">
+                            Ditandatangani secara elektronik oleh<br>
+                            Direktur Politeknik Negeri Banyuwangi<br>
+                            selaku Pejabat yang Berwenang
+                        </div>
+                        <div>
+                            <img src="data:image/svg+xml;base64,{{ base64_encode($qrCodeImage) }}" alt="QR Code"
+                                style="width: 28px; height: 28px;" />
+                        </div>
                     </div>
-                    <div class="stamp-text">
-                        Ditandatangani secara elektronik oleh<br>
-                        Direktur Politeknik Negeri Banyuwangi<br>
-                        selaku Pejabat yang Berwenang
-                    </div>
-                    <div>
-                        <img src="data:image/svg+xml;base64,{{ base64_encode($qrCodeImage) }}" alt="QR Code"
-                            style="width: 28px; height: 28px;" />
-                    </div>
-                </div>
                 </div>
                 <p>
                     <strong>{{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}</strong><br>
-                    NIP {{$perjalanan->pejabat->pegawai->nip}}
+                    NIP {{ $perjalanan->pejabat->pegawai->nip }}
                 </p>
             </div>
         </div>
@@ -544,12 +574,13 @@
                 <td width="5%">I.</td>
                 <td></td>
                 <td>
-                    <strong>Berangkat dari:</strong> {{$perjalanan->detail->kota_keberangkatan}}<br>
-                    <strong>Ke:</strong> {{$perjalanan->detail->kota_tujuan}}<br>
-                    <strong>Pada Tanggal:</strong> {{date('d M Y', strtotime($perjalanan->detail->tanggal_mulai))}}<br><br>
+                    <strong>Berangkat dari:</strong> {{ $perjalanan->detail->kota_keberangkatan }}<br>
+                    <strong>Ke:</strong> {{ $perjalanan->detail->kota_tujuan }}<br>
+                    <strong>Pada Tanggal:</strong>
+                    {{ tanggalIndo($perjalanan->detail->tanggal_mulai) }}<br><br>
                     Direktur,<br><br><br>
                     <strong>{{ $direktur->pegawai->gelar_dpn ?? '' }}{{ $direktur->pegawai->gelar_dpn ? ' ' : '' }}{{ $direktur->pegawai->nama }}{{ $direktur->pegawai->gelar_blk ? ', ' . $direktur->pegawai->gelar_blk : '' }}</strong><br>
-                    NIP {{$direktur->pegawai->nip}}
+                    NIP {{ $direktur->pegawai->nip }}
                 </td>
             </tr>
 
@@ -557,16 +588,18 @@
             <tr>
                 <td>II.</td>
                 <td style="width: 35%">
-                    <strong>Tiba di:</strong> {{$perjalanan->detail->kota_tujuan}}<br>
-                    <strong>Pada Tanggal:</strong> {{date('d M Y', strtotime($perjalanan->detail->tanggal_mulai))}}<br><br>
+                    <strong>Tiba di:</strong> {{ $perjalanan->detail->kota_tujuan }}<br>
+                    <strong>Pada Tanggal:</strong>
+                    {{ tanggalIndo($perjalanan->detail->tanggal_mulai) }}<br><br>
                     Kepala:<br><br><br>
                     (.......................................)<br>
                     NIP:
                 </td>
                 <td style="width: 35%">
-                    <strong>Berangkat dari:</strong> {{$perjalanan->detail->kota_tujuan}}<br>
-                    <strong>Ke:</strong> {{$perjalanan->detail->kota_keberangkatan}}<br>
-                    <strong>Pada Tanggal:</strong> {{date('d M Y', strtotime($perjalanan->detail->tanggal_selesai))}}<br><br>
+                    <strong>Berangkat dari:</strong> {{ $perjalanan->detail->kota_tujuan }}<br>
+                    <strong>Ke:</strong> {{ $perjalanan->detail->kota_keberangkatan }}<br>
+                    <strong>Pada Tanggal:</strong>
+                    {{ tanggalIndo($perjalanan->detail->tanggal_selesai) }}<br><br>
                     Kepala:<br><br><br>
                     (.......................................)<br>
                     NIP:
@@ -638,12 +671,13 @@
                 <td>VI.</td>
                 <td>
                     <strong>Tiba di:</strong> Banyuwangi (Tempat Kedudukan)<br>
-                    <strong>Pada Tanggal:</strong> {{date('d M Y', strtotime($perjalanan->detail->tanggal_selesai))}}<br><br>
+                    <strong>Pada Tanggal:</strong>
+                    {{ tanggalIndo($perjalanan->detail->tanggal_selesai) }}<br><br>
                     Pejabat Pembuat Komitmen
                     <div class="signature-space" style="height: 40px;"></div>
                     <p>
                         <strong>{{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}</strong><br>
-                        NIP {{$perjalanan->pejabat->pegawai->nip}}
+                        NIP {{ $perjalanan->pejabat->pegawai->nip }}
                     </p>
                 </td>
                 <td>
@@ -653,7 +687,7 @@
                     <div class="signature-space" style="height: 40px;"></div>
                     <p>
                         <strong>{{ $perjalanan->pejabat->pegawai->gelar_dpn ?? '' }}{{ $perjalanan->pejabat->pegawai->gelar_dpn ? ' ' : '' }}{{ $perjalanan->pejabat->pegawai->nama }}{{ $perjalanan->pejabat->pegawai->gelar_blk ? ', ' . $perjalanan->pejabat->pegawai->gelar_blk : '' }}</strong><br>
-                        NIP {{$perjalanan->pejabat->pegawai->nip}}
+                        NIP {{ $perjalanan->pejabat->pegawai->nip }}
                     </p>
                 </td>
             </tr>

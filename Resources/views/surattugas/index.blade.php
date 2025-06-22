@@ -40,7 +40,7 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="kelompok-tab" data-bs-toggle="tab" data-bs-target="#kelompok"
                                     type="button" role="tab">
-                                    Kelompok
+                                    Tim
                                 </button>
                             </li>
                         @endif

@@ -72,25 +72,6 @@
         </div>
     </div>
 
-    <div class="form-group row">
-        <div class="col-md-6">
-            <label for="lama_perjalanan">Lama Perjalanan (hari)</label>
-            <input type="number" name="lama_perjalanan" class="form-control" min="1" required>
-        </div>
-        <div class="col-md-6">
-            <label for="anggota_ids">Pengikut</label>
-            <select name="anggota_ids[]" class="tomselect" multiple>
-                @foreach ($pegawai as $pe)
-                    <option value="{{ $pe->id }}">
-                        {{ $pe->gelar_dpn ? $pe->gelar_dpn . ' ' : '' }}
-                        {{ $pe->nama }}
-                        {{ $pe->gelar_blk ? ', ' . $pe->gelar_blk : '' }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-
     <div class="form-group row" id="kota_fields_kelompok" style="display: none;">
         <div class="col-md-6">
             <label>Kota Keberangkatan</label>
@@ -101,6 +82,20 @@
             <input type="text" name="kota_tujuan" class="form-control">
         </div>
     </div>
+
+    <div>
+        <label for="anggota_ids">Pengikut</label>
+        <select name="anggota_ids[]" class="tomselect" multiple>
+            @foreach ($pegawai as $pe)
+                <option value="{{ $pe->id }}">
+                    {{ $pe->gelar_dpn ? $pe->gelar_dpn . ' ' : '' }}
+                    {{ $pe->nama }}
+                    {{ $pe->gelar_blk ? ', ' . $pe->gelar_blk : '' }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <br>
     <button type="submit" class="btn btn-primary">Simpan</button>
     <a href="{{ route('surattugas.index') }}" class="btn btn-default">Kembali</a>
 </form>

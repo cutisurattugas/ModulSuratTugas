@@ -13,6 +13,7 @@ use Modules\SuratTugas\Entities\AnggotaSuratTugas;
 use Modules\SuratTugas\Entities\DetailSuratTugas;
 use Modules\SuratTugas\Entities\SuratTugas;
 use Illuminate\Support\Str;
+use Modules\Cuti\Services\HariKerjaService;
 use Modules\SuratTugas\Entities\LaporanSuratTugas;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -187,18 +188,32 @@ class SuratTugasController extends Controller
                 'status' => 'diproses',
             ]);
 
-            // Handle range tanggal
-            $tanggalRange = explode(' to ', $request->tanggal);
-            $tanggalMulai = $tanggalRange[0];
-            $tanggalSelesai = $tanggalRange[1] ?? $tanggalRange[0];
+            // Explode data rentang cuti
+            $tanggal = $request->input('tanggal');
+            $tanggalRange = explode(' to ', $tanggal);
+            if (count($tanggalRange) == 2) {
+                $awal = $tanggalRange[0];
+                $akhir = $tanggalRange[1];
+
+                // Hitung jumlah hari kerja
+                $hariKerjaService = new HariKerjaService();
+                $jumlah_hari = $hariKerjaService->countHariKerja($awal, $akhir);
+
+                // Cek apakah ada hari kerja
+                if ($jumlah_hari <= 0) {
+                    return redirect()->back()->withInput()->with('error', 'Rentang tidak mencakup hari kerja.');
+                }
+            } elseif (count($tanggalRange) !== 2) {
+                return redirect()->back()->withInput()->with('error', 'Format rentang tidak valid.');
+            }
 
             // Data detail surat tugas
             $detailData = [
                 'surat_tugas_id' => $suratTugas->id,
                 'pegawai_id' => $request->pegawai_id,
                 'kegiatan_maksud' => $request->kegiatan_maksud,
-                'tanggal_mulai' => $tanggalMulai,
-                'tanggal_selesai' => $tanggalSelesai,
+                'tanggal_mulai' => $awal,
+                'tanggal_selesai' => $akhir,
                 'tempat' => $request->tempat,
             ];
 
@@ -215,12 +230,9 @@ class SuratTugasController extends Controller
                 $detailData['kota_tujuan'] = $request->kota_tujuan;
             }
 
-            // Jika jenis tim, validasi lama_perjalanan
+            // Jika jenis tim
             if ($request->jenis === 'tim') {
-                $request->validate([
-                    'lama_perjalanan' => 'required|integer|min:1'
-                ]);
-                $detailData['lama_perjalanan'] = $request->lama_perjalanan;
+                $detailData['lama_perjalanan'] = $jumlah_hari;
             }
 
             // Simpan ke detail_surat_tugas
@@ -325,9 +337,23 @@ class SuratTugasController extends Controller
 
         try {
             // Pisahkan tanggal
-            $dates = explode(' to ', $request->tanggal);
-            $tanggalMulai = $dates[0] ?? null;
-            $tanggalSelesai = $dates[1] ?? $dates[0];
+            $tanggal = $request->input('tanggal');
+            $tanggalRange = explode(' to ', $tanggal);
+            if (count($tanggalRange) == 2) {
+                $awal = $tanggalRange[0];
+                $akhir = $tanggalRange[1];
+
+                // Hitung jumlah hari kerja
+                $hariKerjaService = new HariKerjaService();
+                $jumlah_hari = $hariKerjaService->countHariKerja($awal, $akhir);
+
+                // Cek apakah ada hari kerja
+                if ($jumlah_hari <= 0) {
+                    return redirect()->back()->withInput()->with('error', 'Rentang tidak mencakup hari kerja.');
+                }
+            } elseif (count($tanggalRange) !== 2) {
+                return redirect()->back()->withInput()->with('error', 'Format rentang tidak valid.');
+            }
 
             // Update surat tugas utama
             $suratTugas->update([
@@ -342,8 +368,8 @@ class SuratTugasController extends Controller
                 'pegawai_id' => $request->pegawai_id,
                 'kegiatan_maksud' => $request->kegiatan_maksud,
                 'tempat' => $request->tempat,
-                'tanggal_mulai' => $tanggalMulai,
-                'tanggal_selesai' => $tanggalSelesai,
+                'tanggal_mulai' => $awal,
+                'tanggal_selesai' => $akhir,
             ];
 
             // Tambahkan field hanya jika jarak = luar_kota
@@ -355,7 +381,7 @@ class SuratTugasController extends Controller
 
             // Tambahkan lama_perjalanan hanya jika jenis = tim
             if ($request->jenis === 'tim') {
-                $detailData['lama_perjalanan'] = $request->lama_perjalanan;
+                $detailData['lama_perjalanan'] = $jumlah_hari;
             }
 
             // Update atau buat detail surat tugas

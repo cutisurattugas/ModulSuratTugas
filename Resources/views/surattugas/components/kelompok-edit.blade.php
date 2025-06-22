@@ -71,27 +71,6 @@
     </div>
 </div>
 
-<div class="form-group row">
-    <div class="col-md-6">
-        <label for="lama_perjalanan">Lama Perjalanan (hari)</label>
-        <input type="number" name="lama_perjalanan" class="form-control" min="1"
-            value="{{ $suratTugas->detail->lama_perjalanan }}" required>
-    </div>
-    <div class="col-md-6">
-        <label for="anggota_ids">Anggota Tim</label>
-        <select name="anggota_ids[]" class="tomselect-edit" multiple>
-            @foreach ($pegawai as $pe)
-                <option value="{{ $pe->id }}"
-                    {{ in_array($pe->id, $suratTugas->anggota->pluck('pegawai_id')->toArray()) ? 'selected' : '' }}>
-                    {{ $pe->gelar_dpn ? $pe->gelar_dpn . ' ' : '' }}
-                    {{ $pe->nama }}
-                    {{ $pe->gelar_blk ? ', ' . $pe->gelar_blk : '' }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-</div>
-
 <!-- Kota Keberangkatan & Tujuan -->
 <div class="form-group row" id="kota_fields_kelompok"
     style="{{ $suratTugas->jarak == 'luar_kota' ? '' : 'display: none;' }}">
@@ -107,4 +86,17 @@
             value="{{ old('kota_tujuan', optional($suratTugas->detail)->kota_tujuan) }}"
             placeholder="Contoh: Banyuwangi">
     </div>
+</div>
+<div>
+    <label for="anggota_ids">Anggota Tim</label>
+    <select name="anggota_ids[]" class="tomselect-edit" multiple>
+        @foreach ($pegawai as $pe)
+            <option value="{{ $pe->id }}"
+                {{ in_array($pe->id, $suratTugas->anggota->pluck('pegawai_id')->toArray()) ? 'selected' : '' }}>
+                {{ $pe->gelar_dpn ? $pe->gelar_dpn . ' ' : '' }}
+                {{ $pe->nama }}
+                {{ $pe->gelar_blk ? ', ' . $pe->gelar_blk : '' }}
+            </option>
+        @endforeach
+    </select>
 </div>

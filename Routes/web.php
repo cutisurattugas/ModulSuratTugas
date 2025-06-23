@@ -30,6 +30,9 @@ Route::prefix('surattugas')->group(function () {
         Route::get('/export/pdf', 'RekapPerjadinController@exportPdf')->name('rekap.exportPdf');
         Route::get('/export/excel', 'RekapPerjadinController@exportExcel')->name('rekap.exportExcel');
     });
+    Route::prefix('kepanitiaan')->group(function () {
+        Route::get('/', 'SuratTugasKepanitiaanController@index')->name('kepanitiaan.index');
+    });
 
 });
 

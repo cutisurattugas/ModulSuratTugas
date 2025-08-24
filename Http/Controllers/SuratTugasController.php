@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Modules\Pengaturan\Entities\Pegawai;
-use Modules\Pengaturan\Entities\Pejabat;
 use Modules\SuratTugas\Entities\AnggotaSuratTugas;
 use Modules\SuratTugas\Entities\DetailSuratTugas;
 use Modules\SuratTugas\Entities\SuratTugas;
 use Illuminate\Support\Str;
+use Modules\Cuti\Entities\Pegawai;
 use Modules\Cuti\Services\HariKerjaService;
+use Modules\Jabatan\Entities\Pejabat;
 use Modules\SuratTugas\Entities\LaporanSuratTugas;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -83,7 +83,7 @@ class SuratTugasController extends Controller
 
             // Gabungkan dan hilangkan duplikasi
             $surat_tugas = $semua_surat->merge($milik_sendiri)->unique('id');
-        } elseif (in_array($role, ['pegawai', 'dosen', 'staf'])) {
+        } elseif (in_array($role, ['pegawai', 'dosen', 'staf', 'kajur', 'sekjur', 'kaunit'])) {
             // Pegawai biasa hanya lihat surat tugas individu & tim yang dia terlibat
             $surat_tugas = $query->where(function ($q) use ($pegawai_id) {
                 // Surat individu dimana dia pelaksana
